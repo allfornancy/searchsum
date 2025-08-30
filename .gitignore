@@ -1,0 +1,76 @@
+# macOS系统文件
+._*
+.DS_Store
+.DS_Store?
+._*
+
+# Python相关
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 虚拟环境
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# IDE相关
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志文件
+*.log
+logs/
+
+# 输出文件
+outputs/
+results/
+
+# 数据文件（如果数据文件很大，建议排除）
+# data/
+# *.parquet
+# *.jsonl
+
+# 模型文件
+*.bin
+*.safetensors
+*.ckpt
+*.pth
+
+# 临时文件
+*.tmp
+*.temp
+temp/
+tmp/
+
+# 配置文件（如果包含敏感信息）
+# .env
+# config.ini
+# secrets.json
+
+# 其他
+*.bak
+*.backup 
