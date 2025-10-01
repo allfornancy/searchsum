@@ -573,7 +573,7 @@ The original Search-R1 concept is inspired by [Deepseek-R1](https://github.com/d
 
 ```bibtex
 @article{jin2025search,
-  title={Search-r1: Training llms to reason and leverage search engines with reinforcement learning},
+  title={Search-R1: Training LLMs to Reason and Leverage Search Engines with Reinforcement Learning},
   author={Jin, Bowen and Zeng, Hansi and Yue, Zhenrui and Yoon, Jinsung and Arik, Sercan and Wang, Dong and Zamani, Hamed and Han, Jiawei},
   journal={arXiv preprint arXiv:2503.09516},
   year={2025}
