@@ -288,12 +288,36 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summar
 | | `data.val_batch_size` | 256 | Validation batch size |
 | | `data.max_prompt_length` | 4096 | Maximum prompt length |
 | | `data.max_response_length` | 500 | Maximum response length |
+| | `data.max_start_length` | 2048 | Maximum start sequence length |
+| | `data.max_obs_length` | 500 | Maximum observation length |
+| | `data.shuffle_train_dataloader` | True | Shuffle training data |
 | **Model Config** | `actor_rollout_ref.actor.optim.lr` | 1e-6 | Actor learning rate |
+| | `actor_rollout_ref.actor.optim.lr_warmup_steps_ratio` | 0.285 | Actor learning rate warmup ratio |
 | | `critic.optim.lr` | 1e-5 | Critic learning rate |
+| | `critic.optim.lr_warmup_steps_ratio` | 0.015 | Critic learning rate warmup ratio |
 | | `algorithm.kl_ctrl.kl_coef` | 0.001 | KL divergence control coefficient |
+| | `algorithm.adv_estimator` | gae | Advantage estimation method |
+| | `algorithm.no_think_rl` | false | Disable think-only RL |
+| **PPO Config** | `actor_rollout_ref.actor.ppo_mini_batch_size` | 256 | PPO mini batch size |
+| | `actor_rollout_ref.actor.ppo_micro_batch_size` | 128 | PPO micro batch size |
+| | `critic.ppo_micro_batch_size` | 16 | Critic PPO micro batch size |
+| **Generation Config** | `actor_rollout_ref.rollout.temperature` | 1 | Generation temperature |
+| | `actor_rollout_ref.rollout.top_p` | 1.0 | Top-p sampling |
+| | `actor_rollout_ref.rollout.n_agent` | 1 | Number of agents |
+| | `max_turns` | 5 | Maximum conversation turns |
+| **Memory Config** | `actor_rollout_ref.rollout.gpu_memory_utilization` | 0.8 | GPU memory utilization |
+| | `actor_rollout_ref.model.enable_gradient_checkpointing` | true | Enable gradient checkpointing |
+| | `actor_rollout_ref.model.use_remove_padding` | True | Remove padding optimization |
+| **FSDP Config** | `actor_rollout_ref.actor.fsdp_config.param_offload` | False | Parameter offloading |
+| | `actor_rollout_ref.actor.fsdp_config.grad_offload` | False | Gradient offloading |
+| | `actor_rollout_ref.actor.fsdp_config.optimizer_offload` | False | Optimizer offloading |
 | **Training Config** | `trainer.total_epochs` | 15 | Total training epochs |
 | | `trainer.total_training_steps` | 1005 | Total training steps |
 | | `trainer.save_freq` | 100 | Model save frequency |
+| | `trainer.test_freq` | 100 | Test frequency |
+| | `trainer.n_gpus_per_node` | 4 | GPUs per node |
+| | `trainer.nnodes` | 1 | Number of nodes |
+| | `trainer.critic_warmup` | 0 | Critic warmup steps |
 | **Retrieval Config** | `retriever.url` | "http://127.0.0.1:8000/retrieve" | Retrieval service address |
 | | `retriever.topk` | 3 | Number of retrieved documents |
 
