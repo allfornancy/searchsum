@@ -567,8 +567,6 @@ Our enhancement makes Search-R1 more practical for real-world applications by:
 
 We sincerely thank the [Search-R1](https://github.com/PeterGriffinJin/Search-R1) team for their groundbreaking work on training LLMs to reason and leverage search engines with reinforcement learning. Their innovative framework provided the foundation for our enhanced version with SFT Summarizer integration.
 
-The original Search-R1 concept is inspired by [Deepseek-R1](https://github.com/deepseek-ai/DeepSeek-R1) and [TinyZero](https://github.com/Jiayi-Pan/TinyZero/tree/main), and its implementation is built upon [veRL](https://github.com/volcengine/verl) and [RAGEN](https://github.com/ZihanWang314/RAGEN/tree/main). We appreciate the efforts of all these teams for their contributions to open-source research and development.
-
 ## Citations
 
 ```bibtex
