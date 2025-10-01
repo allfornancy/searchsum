@@ -1,4 +1,4 @@
-# Search-R1: Train your LLMs to reason and call a search engine with reinforcement learning
+# Search-R1 with SFT Summarizer: Enhanced Reasoning and Search Training Framework
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/PeterGriffinJin/Search-R1/main/public/logo.png" alt="logo" width="300"/>
@@ -22,19 +22,24 @@
   </a>
 </p>
 
+## Project Overview
 
-<!-- <strong>Search-R1</strong> is a reinforcement learning framework for <em>training reasoning and searching (tool-call) interleaved LLMs</em>.  -->
-<!-- We built upon [veRL](https://github.com/volcengine/verl). -->
+This project is an enhanced version of [Search-R1](https://github.com/PeterGriffinJin/Search-R1) that integrates a **SFT Summarizer** into the original reinforcement learning framework for training language models with reasoning and search capabilities.
+
+**Key Features:**
+- 🚀 Built on Search-R1's reinforcement learning framework
+- 📝 Integrated SFT Summarizer for intelligent text summarization
+- 🔍 Support for multiple search engines (local retrievers, online search engines)
+- 🧠 Support for various LLM models (Llama3, Qwen2.5, etc.)
+- ⚡ Support for multiple reinforcement learning methods (PPO, GRPO, etc.)
+
 **Search-R1** is a reinforcement learning framework designed for training **reasoning-and-searching interleaved LLMs**—language models that learn to reason and make tool calls (e.g., to search engines) in a coordinated manner.
 
-<!-- It can be seen as an extension of <strong>DeepSeek-R1(-Zero)</strong> with interleaved search engine calling and an opensource RL training-based solution for <strong>OpenAI DeepResearch</strong>. -->
 Built upon [veRL](https://github.com/volcengine/verl), Search-R1 extends the ideas of **DeepSeek-R1(-Zero)** by incorporating interleaved search engine access and provides a fully open-source RL training pipeline. It serves as an alternative and open solution to **OpenAI DeepResearch**, enabling research and development in tool-augmented LLM reasoning.
-
-<!-- Through RL (rule-based outcome reward), the 3B **base** LLM (both Qwen2.5-3b-base and Llama3.2-3b-base) develops reasoning and search engine calling abilities all on its own. -->
 
 We support different RL methods (e.g., PPO, GRPO, reinforce), different LLMs (e.g., llama3, Qwen2.5, etc) and different search engines (e.g., local sparse/dense retrievers and online search engines).
 
-Paper: [link1](https://arxiv.org/pdf/2503.09516), [link2](https://arxiv.org/abs/2505.15117); Model and data: [link](https://huggingface.co/collections/PeterJinGo/search-r1-67d1a021202731cb065740f5); Twitter thread: [link](https://x.com/BowenJin13/status/1895544294473109889); Full experiment log: [prelim](https://wandb.ai/peterjin/Search-R1-open); [v0.1](https://wandb.ai/peterjin/Search-R1-nq_hotpotqa_train); [v0.2](https://wandb.ai/peterjin/Search-R1-v0.2); [v0.3](https://wandb.ai/peterjin/Search-R1-v0.3). Details about these logs and methods can be find [here](https://github.com/PeterGriffinJin/Search-R1/blob/main/docs/experiment_log.md).
+Original Papers: [link1](https://arxiv.org/pdf/2503.09516), [link2](https://arxiv.org/abs/2505.15117); Models and Data: [link](https://huggingface.co/collections/PeterJinGo/search-r1-67d1a021202731cb065740f5); Twitter Thread: [link](https://x.com/BowenJin13/status/1895544294473109889); Full Experiment Logs: [prelim](https://wandb.ai/peterjin/Search-R1-open); [v0.1](https://wandb.ai/peterjin/Search-R1-nq_hotpotqa_train); [v0.2](https://wandb.ai/peterjin/Search-R1-v0.2); [v0.3](https://wandb.ai/peterjin/Search-R1-v0.3). Details about these logs and methods can be found [here](https://github.com/PeterGriffinJin/Search-R1/blob/main/docs/experiment_log.md).
 
 
 ![single-turn](public/main.png)
@@ -49,16 +54,18 @@ Paper: [link1](https://arxiv.org/pdf/2503.09516), [link2](https://arxiv.org/abs/
 - [2025.3] The first Search-R1 [paper](https://arxiv.org/pdf/2503.09516) is published with the logs: [v0.1](https://wandb.ai/peterjin/Search-R1-nq_hotpotqa_train); [v0.2](https://wandb.ai/peterjin/Search-R1-v0.2).
 - [2025.2] We opensource Search-R1 codebase with [preliminary results](https://wandb.ai/peterjin/Search-R1-open).
 
-## Links
+## Table of Contents
 
 - [Installation](#installation)
-- [Quick start](#quick-start)
-- [Preliminary results](#preliminary-results)
+- [Quick Start](#quick-start)
+- [SFT Summarizer Usage](#sft-summarizer-usage)
+- [Training Configuration](#training-configuration)
+- [Preliminary Results](#preliminary-results)
 - [Inference](#inference)
-- [Use your own dataset](#use-your-own-dataset)
-- [Use your own search engine](#use-your-own-search-engine)
+- [Use Your Own Dataset](#use-your-own-dataset)
+- [Use Your Own Search Engine](#use-your-own-search-engine)
 - [Features](#features)
-- [Ackowledge](#acknowledge)
+- [Acknowledgments](#acknowledgments)
 - [Citations](#citations)
 
 ## Installation
@@ -98,9 +105,11 @@ pip install uvicorn fastapi
 ```
 
 
-## Quick start
+## Quick Start
 
-Train a reasoning + search LLM on NQ dataset with e5 as the retriever and wikipedia as the corpus.
+Train a reasoning + search LLM on NQ dataset with e5 as the retriever and Wikipedia as the corpus.
+
+### Environment Setup
 
 (1) Download the indexing and corpus.
 ```bash
@@ -115,17 +124,295 @@ gzip -d $save_path/wiki-18.jsonl.gz
 python scripts/data_process/nq_search.py
 ```
 
+### Launch Services
+
 (3) Launch a local retrieval server.
 ```bash
 conda activate retriever
 bash retrieval_launch.sh
 ```
 
-(4) Run RL training (PPO) with Llama-3.2-3b-base.
+(4) **Launch SFT Summarizer server** (New feature in this project).
+```bash
+conda activate retriever
+bash retrieval_with_summarizer_launch.sh
+```
+
+### Start Training
+
+(5) Run RL training (PPO) with Qwen2.5-3B-Instruct.
 ```bash
 conda activate searchr1
 bash train_ppo.sh
 ```
+
+### Service Descriptions
+
+- **Retrieval Server** (`retrieval_launch.sh`): Launches basic retrieval service
+- **SFT Summarizer Server** (`retrieval_with_summarizer_launch.sh`): Launches retrieval service integrated with SFT summarizer
+- **Training Script** (`train_ppo.sh`): Launches PPO reinforcement learning training
+
+> **Note**: Ensure that both the retrieval server and SFT Summarizer server are running properly before starting training.
+
+## SFT Summarizer Usage
+
+### Overview
+
+SFT Summarizer is the core innovative feature of this project. It integrates a Supervised Fine-Tuning (SFT) summarizer into the retrieval pipeline, enabling intelligent summarization of retrieved documents and improving the model's understanding and processing capabilities for long documents.
+
+### Launching SFT Summarizer
+
+#### Method 1: Using Launch Script (Recommended)
+```bash
+# Activate retrieval environment
+conda activate retriever
+
+# Launch SFT Summarizer server
+bash retrieval_with_summarizer_launch.sh
+```
+
+#### Method 2: Direct Python Script Execution
+```bash
+# Activate retrieval environment
+conda activate retriever
+
+# Set GPU device (optional, defaults to GPU 4)
+export CUDA_VISIBLE_DEVICES=4
+
+# Run SFT Summarizer directly
+python search_r1/search/retrieval_with_summarizer.py
+```
+
+### Configuration
+
+Main configuration parameters for SFT Summarizer:
+
+- **GPU Device**: Default uses `CUDA_VISIBLE_DEVICES=4`
+- **Server Port**: Default runs on `http://127.0.0.1:8000`
+- **Retriever**: Uses e5-base-v2 model for document retrieval
+- **Summarizer**: Integrates SFT-trained summarization model
+
+### API Endpoints
+
+SFT Summarizer provides the following API endpoints:
+
+#### 1. Retrieve and Summarize
+```bash
+POST http://127.0.0.1:8000/retrieve
+Content-Type: application/json
+
+{
+    "query": "Your query question",
+    "topk": 3
+}
+```
+
+#### 2. Summarize Only
+```bash
+POST http://127.0.0.1:8000/summarize
+Content-Type: application/json
+
+{
+    "text": "Text content to be summarized"
+}
+```
+
+### Integration with Training Pipeline
+
+During training, the model uses SFT Summarizer in the following way:
+
+1. **Query Processing**: Model generates search queries
+2. **Document Retrieval**: Uses e5 retriever to find relevant documents
+3. **Intelligent Summarization**: SFT Summarizer summarizes retrieved documents
+4. **Reasoning Generation**: Performs reasoning and answering based on summarized content
+
+### Troubleshooting
+
+#### Common Issues
+
+1. **GPU Memory Insufficient**
+   ```bash
+   # Reduce batch size or use smaller model
+   export CUDA_VISIBLE_DEVICES=0  # Use different GPU
+   ```
+
+2. **Port Already in Use**
+   ```bash
+   # Check port usage
+   lsof -i :8000
+   
+   # Kill process using the port
+   kill -9 <PID>
+   ```
+
+3. **Model Loading Failed**
+   ```bash
+   # Check model path and permissions
+   ls -la /path/to/model
+   ```
+
+## Training Configuration
+
+### Training Script Overview
+
+This project uses the `train_ppo.sh` script for PPO reinforcement learning training with the following main configurations:
+
+#### Basic Configuration
+```bash
+# GPU settings
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+
+# Data path
+export DATA_DIR='data/nq_hotpotqa_train'
+
+# Base model
+export BASE_MODEL='/mnt/nvme_data/Qwen2.5-3B-Instruct'
+
+# Experiment name
+export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summarizer
+```
+
+#### Training Parameters Details
+
+| Parameter Category | Parameter Name | Value | Description |
+|-------------------|----------------|-------|-------------|
+| **Data Config** | `data.train_batch_size` | 512 | Training batch size |
+| | `data.val_batch_size` | 256 | Validation batch size |
+| | `data.max_prompt_length` | 4096 | Maximum prompt length |
+| | `data.max_response_length` | 500 | Maximum response length |
+| **Model Config** | `actor_rollout_ref.actor.optim.lr` | 1e-6 | Actor learning rate |
+| | `critic.optim.lr` | 1e-5 | Critic learning rate |
+| | `algorithm.kl_ctrl.kl_coef` | 0.001 | KL divergence control coefficient |
+| **Training Config** | `trainer.total_epochs` | 15 | Total training epochs |
+| | `trainer.total_training_steps` | 1005 | Total training steps |
+| | `trainer.save_freq` | 100 | Model save frequency |
+| **Retrieval Config** | `retriever.url` | "http://127.0.0.1:8000/retrieve" | Retrieval service address |
+| | `retriever.topk` | 3 | Number of retrieved documents |
+
+### Starting Training
+
+#### 1. Ensure Services are Running
+```bash
+# Launch retrieval server
+conda activate retriever
+bash retrieval_launch.sh
+
+# Launch SFT Summarizer server
+bash retrieval_with_summarizer_launch.sh
+```
+
+#### 2. Begin Training
+```bash
+# Activate training environment
+conda activate searchr1
+
+# Start training
+bash train_ppo.sh
+```
+
+### Training Monitoring
+
+#### Log Files
+Training logs are saved to:
+```bash
+/mnt/nvme_data/$EXPERIMENT_NAME.log
+```
+
+#### Model Checkpoints
+Model checkpoints are saved to:
+```bash
+/mnt/nvme_data/verl_checkpoints/$EXPERIMENT_NAME/
+```
+
+#### Real-time Monitoring
+```bash
+# View training logs
+tail -f /mnt/nvme_data/$EXPERIMENT_NAME.log
+
+# Check GPU usage
+nvidia-smi
+
+# Check training processes
+ps aux | grep main_ppo
+```
+
+### Custom Training Configuration
+
+#### Modify Model Path
+```bash
+# Modify in train_ppo.sh
+export BASE_MODEL='/your/path/to/model'
+```
+
+#### Adjust Training Parameters
+```bash
+# Modify batch size
+data.train_batch_size=256  # Reduce memory usage
+
+# Modify learning rate
+actor_rollout_ref.actor.optim.lr=5e-7  # Smaller learning rate
+
+# Modify training steps
+trainer.total_training_steps=2000  # More training steps
+```
+
+#### Use Different Retrievers
+```bash
+# Modify retriever URL
+retriever.url="http://127.0.0.1:8001/retrieve"  # Different port
+
+# Modify number of retrieved documents
+retriever.topk=5  # Retrieve more documents
+```
+
+### Multi-GPU Training
+
+#### Single Node Multi-GPU
+```bash
+# Set GPUs to use
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+
+# Adjust GPU count
+trainer.n_gpus_per_node=8
+```
+
+#### Multi-Node Training
+```bash
+# Set number of nodes
+trainer.nnodes=2
+
+# Set GPUs per node
+trainer.n_gpus_per_node=4
+```
+
+### Troubleshooting
+
+#### Common Training Issues
+
+1. **Insufficient Memory**
+   ```bash
+   # Reduce batch size
+   data.train_batch_size=256
+   actor_rollout_ref.actor.ppo_micro_batch_size=64
+   ```
+
+2. **Slow Training Speed**
+   ```bash
+   # Enable gradient checkpointing
+   actor_rollout_ref.model.enable_gradient_checkpointing=true
+   
+   # Use XFORMERS backend
+   export VLLM_ATTENTION_BACKEND=XFORMERS
+   ```
+
+3. **Retrieval Service Connection Failed**
+   ```bash
+   # Check if service is running
+   curl http://127.0.0.1:8000/health
+   
+   # Check port usage
+   lsof -i :8000
+   ```
 
 ## Preliminary results
 
@@ -210,12 +497,31 @@ The LLM can call the search engine by calling the search API (e.g., "http://127.
 You can refer to ```search_r1/search/retriever_server.py``` for an example of launching a local retriever server.
 
 ## Features
-- Support local sparse retrievers (e.g., BM25). ✔️
-- Support local dense retrievers (both flat indexing and ANN indexing) ✔️
-- Support google search / bing search / brave search API and others. ✔️
-- Support off-the-shelf neural rerankers. ✔️
-- Support different RL methods (e.g., PPO, GRPO, reinforce). ✔️
-- Support different LLMs (e.g., llama3, Qwen2.5, etc). ✔️
+
+### 🔍 Search Engine Support
+- ✅ Local sparse retrievers (e.g., BM25)
+- ✅ Local dense retrievers (flat indexing and ANN indexing)
+- ✅ Online search engines (Google, Bing, Brave, etc.)
+- ✅ Off-the-shelf neural rerankers
+
+### 🧠 Model Support
+- ✅ Multiple LLM models (Llama3, Qwen2.5, etc.)
+- ✅ Multiple reinforcement learning methods (PPO, GRPO, reinforce)
+- ✅ Multi-GPU and multi-node training support
+
+### 📝 SFT Summarizer Features (Core Innovation of This Project)
+- ✅ **Intelligent Document Summarization**: Automatic summarization of retrieved long documents
+- ✅ **SFT Fine-tuning**: Dedicated summarization model trained with supervised fine-tuning
+- ✅ **Seamless Integration**: Perfect integration with retrieval pipeline, no additional configuration needed
+- ✅ **API Interface**: RESTful API for retrieval and summarization
+- ✅ **GPU Acceleration**: GPU-accelerated summarization generation
+- ✅ **Configurability**: Support for custom summarization length and style
+
+### 🚀 Training Features
+- ✅ **End-to-End Training**: Complete training pipeline from retrieval to summarization to reasoning
+- ✅ **Reinforcement Learning**: Uses PPO and other algorithms to optimize search and reasoning capabilities
+- ✅ **Multi-turn Dialogue**: Support for multi-turn search and reasoning interactions
+- ✅ **Real-time Monitoring**: Complete training logs and checkpoint management
 
 ## Acknowledge
 
