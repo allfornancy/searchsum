@@ -65,7 +65,7 @@ Original Papers: [link1](https://arxiv.org/pdf/2503.09516), [link2](https://arxi
 - [Use Your Own Search Engine](#use-your-own-search-engine)
 - [Features](#features)
 - [Our Contributions](#our-contributions)
-- [Search-R1](#search-r1)
+- [Acknowledgments](#acknowledgments)
 - [Citations](#citations)
 
 ## Installation
@@ -420,7 +420,7 @@ trainer.n_gpus_per_node=4
    
    # Check port usage
    lsof -i :8000
-   ```
+```
 
 ## Preliminary results
 
@@ -563,11 +563,11 @@ Our enhancement makes Search-R1 more practical for real-world applications by:
 - Providing production-ready deployment options
 - Maintaining the original framework's research capabilities
 
-## Search-R1
+## Acknowledgments
 
-The concept of Search-R1 is inspired by [Deepseek-R1](https://github.com/deepseek-ai/DeepSeek-R1) and [TinyZero](https://github.com/Jiayi-Pan/TinyZero/tree/main).
-Its implementation is built upon [veRL](https://github.com/volcengine/verl) and [RAGEN](https://github.com/ZihanWang314/RAGEN/tree/main). 
-We sincerely appreciate the efforts of these teams for their contributions to open-source research and development.
+We sincerely thank the [Search-R1](https://github.com/PeterGriffinJin/Search-R1) team for their groundbreaking work on training LLMs to reason and leverage search engines with reinforcement learning. Their innovative framework provided the foundation for our enhanced version with SFT Summarizer integration.
+
+The original Search-R1 concept is inspired by [Deepseek-R1](https://github.com/deepseek-ai/DeepSeek-R1) and [TinyZero](https://github.com/Jiayi-Pan/TinyZero/tree/main), and its implementation is built upon [veRL](https://github.com/volcengine/verl) and [RAGEN](https://github.com/ZihanWang314/RAGEN/tree/main). We appreciate the efforts of all these teams for their contributions to open-source research and development.
 
 ## Citations
 
