@@ -53,16 +53,6 @@ Original Papers: [link1](https://arxiv.org/pdf/2503.09516), [link2](https://arxi
 
 ![single-turn](public/main.png)
 
-## News
-
-- [2025.7] Search-R1 is supported by [SkyRL](https://github.com/NovaSky-AI/SkyRL)! Detailed instructions: [code](https://github.com/NovaSky-AI/SkyRL/tree/main/skyrl-train/examples/search), [Document](https://novasky-ai.notion.site/skyrl-searchr1).
-- [2025.6] Search-R1 is now integrated into the latest version of veRL and can take advantage of its most up-to-date features! Detailed instructions: [veRL](https://verl.readthedocs.io/en/latest/sglang_multiturn/search_tool_example.html), [English Document](https://github.com/zhaochenyang20/Awesome-ML-SYS-Tutorial/blob/main/rlhf/verl/multi-turn/tool_examples/verl-multiturn-searchR1-like.md), [Chinese Document](https://github.com/zhaochenyang20/Awesome-ML-SYS-Tutorial/blob/main/rlhf/verl/multi-turn/tool_examples/verl-multiturn-searchR1-like_ZH.md).
-- [2025.5] The second [paper](https://arxiv.org/abs/2505.15117) conducting detailed empirical studies is published with logs: [v0.3](https://wandb.ai/peterjin/Search-R1-v0.3). 
-- [2025.4] We support [multinode](https://github.com/PeterGriffinJin/Search-R1/blob/main/docs/multinode.md) training for 30B+ LLMs!
-- [2025.4] We support [different search engines](https://github.com/PeterGriffinJin/Search-R1/blob/main/docs/retriever.md) including sparse local retriever, dense local retriever with ANN indexing and online search engines!
-- [2025.3] The first Search-R1 [paper](https://arxiv.org/pdf/2503.09516) is published with the logs: [v0.1](https://wandb.ai/peterjin/Search-R1-nq_hotpotqa_train); [v0.2](https://wandb.ai/peterjin/Search-R1-v0.2).
-- [2025.2] We opensource Search-R1 codebase with [preliminary results](https://wandb.ai/peterjin/Search-R1-open).
-
 ## Table of Contents
 
 - [Installation](#installation)
@@ -75,7 +65,8 @@ Original Papers: [link1](https://arxiv.org/pdf/2503.09516), [link2](https://arxi
 - [Use Your Own Search Engine](#use-your-own-search-engine)
 - [Features](#features)
 - [Our Contributions](#our-contributions)
-- [Acknowledgments](#acknowledgments)
+- [Search-R1](#search-r1)
+- [Awesome work powered or inspired by Search-R1](#awesome-work-powered-or-inspired-by-search-r1)
 - [Citations](#citations)
 
 ## Installation
@@ -573,7 +564,7 @@ Our enhancement makes Search-R1 more practical for real-world applications by:
 - Providing production-ready deployment options
 - Maintaining the original framework's research capabilities
 
-## Acknowledge
+## Search-R1
 
 The concept of Search-R1 is inspired by [Deepseek-R1](https://github.com/deepseek-ai/DeepSeek-R1) and [TinyZero](https://github.com/Jiayi-Pan/TinyZero/tree/main).
 Its implementation is built upon [veRL](https://github.com/volcengine/verl) and [RAGEN](https://github.com/ZihanWang314/RAGEN/tree/main). 
