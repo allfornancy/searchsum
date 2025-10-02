@@ -1,4 +1,4 @@
-# Search-R1 with SFT Summarizer: Enhanced Reasoning and Search Training Framework
+# RECON: Efficient Multi-Hop RAG via Learned Context Compression
 
 
 
