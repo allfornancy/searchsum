@@ -337,7 +337,8 @@ trainer.total_training_steps=2000  # More training steps
 ```
 
 ## Inference
-#### You can play with the trained Search-R1 model with your own question.
+
+### Standard Inference (without Summarizer)
 (1) Launch a local retrieval server.
 ```bash
 conda activate retriever
@@ -349,6 +350,25 @@ bash retrieval_launch.sh
 conda activate searchr1
 python infer.py
 ```
+
+### RECON Inference (with Summarizer)
+(1) Launch retrieval server with summarizer.
+```bash
+conda activate retriever
+bash retrieval_launch.sh
+```
+
+(2) Launch SFT summarizer server.
+```bash
+bash retrieval_with_summarizer_launch.sh
+```
+
+(3) Run RECON inference.
+```bash
+conda activate searchr1
+python infer_with_summarizer.py
+```
+
 You can modify the ```question``` on line 7 to something you're interested in.
 
 ## Features
