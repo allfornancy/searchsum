@@ -103,6 +103,8 @@ python scripts/data_process/nq_search.py
 python scripts/data_process/hotpotqa_search.py
 ```
 
+> Run **both** preprocessing steps if you train on the combined NQ + HotpotQA mixture.
+
 ### Launch Services
 
 (3) Launch a local retrieval server.
@@ -119,7 +121,8 @@ bash retrieval_with_summarizer_launch.sh
 
 ### Start Training
 
-(5) Run RL training (PPO) with Qwen2.5-3B-Instruct.
+(5) Run RL training (PPO) with Qwen2.5-3B-Base.
+# (Optional) For ablation, switch to Qwen2.5-3B-Instruct.
 ```bash
 conda activate searchr1
 bash train_ppo.sh
@@ -134,6 +137,8 @@ bash train_ppo.sh
 > **Note**: Ensure that both the retrieval server and SFT Summarizer server are running properly before starting training.
 
 ## SFT Summarizer Usage
+
+> Deployment note: In our reference setup, the retrieval and summarization services run on the **same machine/GPUs** as training, with `gpu_memory_utilization=0.8` on the policy side (≈20% headroom for the services). You can also host them on separate GPUs or a remote node.
 
 ### Overview
 
@@ -207,13 +212,25 @@ Main configuration parameters for SFT Summarizer:
 
 SFT Summarizer provides the following API endpoints:
 
-#### 1. Retrieve and Summarize
+#### 1. Retrieve and Summarize (single query)
 ```bash
 POST http://127.0.0.1:8000/retrieve
 Content-Type: application/json
 
 {
-    "queries": ["Your query question"],
+    "query": "Your query question",
+    "topk": 5,
+    "return_scores": false
+}
+```
+
+#### 1b. (Optional) Batch Retrieve and Summarize
+```bash
+POST http://127.0.0.1:8000/batch_retrieve
+Content-Type: application/json
+
+{
+    "queries": ["Question 1", "Question 2"],
     "topk": 5,
     "return_scores": false
 }
@@ -265,7 +282,8 @@ During training, the model uses SFT Summarizer in the following way:
 
 ## Training Configuration
 
-**Reward:** exact-match (EM) on the final answer; retrieved tokens are masked from the loss.
+**Reward:** Exact-match (EM) computed on the final answer.  
+**Loss masking:** Only LLM-generated tokens (reasoning, queries, answers) are optimized; retrieved evidence tokens are masked out of the loss.
 
 ### Training Script Overview
 
@@ -315,6 +333,8 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summar
 | | `critic.cliprange_value` | 0.5 | Value function clipping range |
 | **Generation Config** | `actor_rollout_ref.rollout.temperature` | 1.0 | Generation temperature (near-deterministic) |
 | | `actor_rollout_ref.rollout.top_p` | 1.0 | Top-p sampling (near-deterministic) |
+
+> We match Search-R1's decoding recipe (temperature=1.0, top-p=1.0) for apples-to-apples comparison; despite not being greedy (temp=0), this behaves stably in our setup.
 | | `actor_rollout_ref.rollout.n_agent` | 1 | Number of agents |
 | | `max_turns` | 5 | Maximum conversation turns (vs baseline 3) |
 | **Memory Config** | `actor_rollout_ref.rollout.gpu_memory_utilization` | 0.8 | GPU memory utilization |
@@ -335,6 +355,8 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summar
 | | `trainer.critic_warmup` | 0 | Critic warmup steps |
 | **Retrieval Config** | `retriever.url` | "http://127.0.0.1:8000/retrieve" | Retrieval service address |
 | | `retriever.topk` | 5 | Number of retrieved documents (ours; baseline uses top-3) |
+
+> Note: The original Search-R1 baseline uses `topk=3` and `max_turns=3`; RECON uses `topk=5` and `max_turns=5`.
 | **Precision Config** | `actor_rollout_ref.model.torch_dtype` | bfloat16 | Training precision |
 | | `actor_rollout_ref.rollout.torch_dtype` | bfloat16 | Inference precision |
 | **Random Seed** | `actor_rollout_ref.actor.megatron.seed` | 1 | Random seed (actor) |
@@ -481,8 +503,12 @@ trainer.n_gpus_per_node=4
 - **Avg inference time**: 28.79s → 19.9s
 - **Avg search turns**: 2.13 → 1.84
 
+(Averages are computed over the same 7 datasets as in Table 3 of the paper.)
+
 ### 🚀 **Training Speed**
 - **3B on 4× H200, 500 steps**: RECON 13.9h vs Search-R1 14.7h (≈5.2% faster)
+
+*(Timing measured on a 500-step run; full training runs in the paper use 1005 steps / 15 epochs.)*
 
 ### 🧪 **Ablations**
 #### **Instruct vs Base (3B)**
@@ -578,7 +604,7 @@ You can refer to ```search_r1/search/retriever_server.py``` for an example of la
 
 ### 🧠 Model Support
 - ✅ Multiple LLM models (Llama3, Qwen2.5, etc.)
-- ✅ Multiple reinforcement learning methods (PPO, GRPO, reinforce)
+- ✅ Multiple reinforcement learning methods supported by the underlying framework (e.g., PPO; GRPO/REINFORCE are framework-level options). **This project's experiments use PPO-only (no GRPO).**
 - ✅ Multi-GPU and multi-node training support
 
 ### 📝 RECON Summarizer Features (Our Core Innovation & Contribution)
