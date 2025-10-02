@@ -51,7 +51,6 @@ We support different RL methods (e.g., PPO, GRPO, reinforce), different LLMs (e.
 Original Papers: [link1](https://arxiv.org/pdf/2503.09516), [link2](https://arxiv.org/abs/2505.15117); Models and Data: [link](https://huggingface.co/collections/PeterJinGo/search-r1-67d1a021202731cb065740f5); Twitter Thread: [link](https://x.com/BowenJin13/status/1895544294473109889); Full Experiment Logs: [prelim](https://wandb.ai/peterjin/Search-R1-open); [v0.1](https://wandb.ai/peterjin/Search-R1-nq_hotpotqa_train); [v0.2](https://wandb.ai/peterjin/Search-R1-v0.2); [v0.3](https://wandb.ai/peterjin/Search-R1-v0.3). Details about these logs and methods can be found [here](https://github.com/PeterGriffinJin/Search-R1/blob/main/docs/experiment_log.md).
 
 
-![single-turn](public/main.png)
 
 ## Table of Contents
 
@@ -450,12 +449,10 @@ trainer.n_gpus_per_node=4
 
 (1) The base model (llama3.2-3b-base) learns to call the search engine and obtain improved performance.
 
-![llama-3b](public/llama32-3b.png)
 
 
 (2) The base model (Qwen2.5-7b-base) can learn to conduct multi-turn search engine calling and reasoning with RL.
 
-![multi-turn](public/multi-turn.png)
 
 ## Inference
 #### You can play with the trained Search-R1 model with your own question.
