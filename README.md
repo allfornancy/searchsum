@@ -336,35 +336,6 @@ actor_rollout_ref.actor.optim.lr=5e-7  # Smaller learning rate
 trainer.total_training_steps=2000  # More training steps
 ```
 
-#### Use Different Retrievers
-```bash
-# Modify retriever URL
-retriever.url="http://127.0.0.1:8001/retrieve"  # Different port
-
-# Modify number of retrieved documents
-retriever.topk=5  # Ours (baseline uses top-3)
-```
-
-### Multi-GPU Training
-
-#### Single Node Multi-GPU
-```bash
-# Set GPUs to use
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-
-# Adjust GPU count
-trainer.n_gpus_per_node=8
-```
-
-#### Multi-Node Training
-```bash
-# Set number of nodes
-trainer.nnodes=2
-
-# Set GPUs per node
-trainer.n_gpus_per_node=4
-```
-
 ## Inference
 #### You can play with the trained Search-R1 model with your own question.
 (1) Launch a local retrieval server.
