@@ -6,15 +6,6 @@
 
 **TL;DR.** We extend the Search-R1 reinforcement-learning framework by inserting a learned summarization module into the reasoning-retrieval loop. Instead of concatenating raw retrieved documents, RECON first condenses evidence into short, clarity-guided summaries and then reasons over the compressed context. This active context compression improves accuracy and efficiency at the same time—especially for multi-hop QA—using only SFT-trained summarizers.
 
-### 🔍 **Motivation**
-
-Retrieval-augmented generation (RAG) systems interleave language model reasoning with external search, but current RL-trained agents (e.g., Search-R1) suffer from:
-- **Context bloat**: concatenating long, noisy documents inflates the prompt, slows decoding, and increases cost.
-- **Multi-turn accumulation**: multi-hop reasoning compounds redundancy as more text is added each turn.
-- **Quality degradation**: irrelevant details distract the policy and make decision-making less reliable.
-
-RECON addresses these pain points by compressing retrieved evidence inside the RL loop via a dedicated summarizer. The policy reads only what matters—short, factual, and well-structured summaries—so it reasons faster and more robustly.
-
 ### 🧠 **What is RECON?**
 
 RECON (REasoning with CONdensation) is a drop-in augmentation to Search-R1:
