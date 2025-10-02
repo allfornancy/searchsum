@@ -1,25 +1,6 @@
 # Search-R1 with SFT Summarizer: Enhanced Reasoning and Search Training Framework
 
-<div align="center">
-</div>
 
-<p align="center">
-  <a href="https://arxiv.org/abs/2503.09516">
-    <img src="https://img.shields.io/badge/Paper1-blue?style=for-the-badge" alt="Button1"/>
-  </a>
-  <a href="https://arxiv.org/abs/2505.15117">
-    <img src="https://img.shields.io/badge/Paper2-green?style=for-the-badge" alt="Button2"/>
-  </a>
-  <a href="https://huggingface.co/collections/PeterJinGo/search-r1-67d1a021202731cb065740f5">
-    <img src="https://img.shields.io/badge/Resources-orange?style=for-the-badge" alt="Button3"/>
-  </a>
-  <a href="https://x.com/BowenJin13/status/1895544294473109889">
-    <img src="https://img.shields.io/badge/Tweet-red?style=for-the-badge" alt="Button4"/>
-  </a>
-  <a href="https://wandb.ai/peterjin/Search-R1-v0.2">
-    <img src="https://img.shields.io/badge/Logs-purple?style=for-the-badge" alt="Button5"/>
-  </a>
-</p>
 
 ## Project Overview
 
