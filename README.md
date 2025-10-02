@@ -183,44 +183,6 @@ Main configuration parameters for SFT Summarizer:
 - **Deployment**: For separate machines/GPUs, adjust `CUDA_VISIBLE_DEVICES` and URL accordingly
 - **Memory Management**: When co-locating services with training, we set `gpu_memory_utilization=0.8` for the policy to leave ~20% headroom for the services on the same GPUs
 
-### API Endpoints
-
-SFT Summarizer provides the following API endpoints:
-
-#### 1. Retrieve and Summarize (single query)
-```http
-POST http://127.0.0.1:8000/retrieve
-Content-Type: application/json
-
-{
-    "query": "Your query question",
-    "topk": 5,
-    "return_scores": false
-}
-```
-
-#### 1b. (Optional) Batch Retrieve and Summarize
-```http
-POST http://127.0.0.1:8000/batch_retrieve
-Content-Type: application/json
-
-{
-    "queries": ["Question 1", "Question 2"],
-    "topk": 5,
-    "return_scores": false
-}
-```
-
-#### 2. Summarize Only (Optional)
-```http
-POST http://127.0.0.1:8000/summarize
-Content-Type: application/json
-
-{
-    "text": "Text content to be summarized"
-}
-```
-
 ### Integration with Training Pipeline
 
 During training, the model uses SFT Summarizer in the following way:
