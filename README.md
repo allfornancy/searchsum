@@ -127,20 +127,6 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-base-v0.2-summarizer
 bash train_ppo.sh
 ```
 
-### Training Configuration
-
-**Key Parameters:**
-- **Model**: Qwen2.5-3B-Base (default) or Qwen2.5-3B-Instruct (ablation)
-- **Training Data**: NQ + HotpotQA (`data/nq_hotpotqa_train/`)
-- **Retriever**: e5-base-v2 with FAISS-GPU
-- **Max Turns**: 5 (vs. Search-R1 baseline's 3)
-- **Top-k**: 5 (vs. Search-R1 baseline's 3)
-- **Training Steps**: 1005 steps / 15 epochs
-- **GPUs**: 4× H200/A100
-
-**Reward:** Exact-match (EM) computed on the final answer.  
-**Loss masking:** Only LLM-generated tokens (reasoning, queries, answers) are optimized; retrieved evidence tokens are masked out of the loss.
-
 ## SFT Summarizer Usage
 
 > Deployment note: In our reference setup, the retrieval and summarization services run on the **same machine/GPUs** as training, with `gpu_memory_utilization=0.8` on the policy side (≈20% headroom for the services). You can also host them on separate GPUs or a remote node.
