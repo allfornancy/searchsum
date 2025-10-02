@@ -338,21 +338,9 @@ trainer.total_training_steps=2000  # More training steps
 
 ## Inference
 
-### Standard Inference (without Summarizer)
-(1) Launch a local retrieval server.
-```bash
-conda activate retriever
-bash retrieval_launch.sh
-```
+#### You can play with the trained RECON model with your own question.
 
-(2) Run inference.
-```bash
-conda activate searchr1
-python infer.py
-```
-
-### RECON Inference (with Summarizer)
-(1) Launch retrieval server with summarizer.
+(1) Launch retrieval server.
 ```bash
 conda activate retriever
 bash retrieval_launch.sh
