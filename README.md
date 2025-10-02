@@ -4,31 +4,26 @@
 
 ## Project Overview
 
-This project represents a **significant enhancement** to the original [Search-R1](https://github.com/PeterGriffinJin/Search-R1) framework, introducing a novel **SFT Summarizer** component that revolutionizes how language models process and utilize retrieved information during reasoning tasks.
+**TL;DR.** We extend the Search-R1 reinforcement-learning framework by inserting a learned summarization module into the reasoning–retrieval loop. Instead of concatenating raw retrieved documents, RECON first condenses evidence into short, clarity-guided summaries and then reasons over the compressed context. This active context compression improves accuracy and efficiency at the same time—especially for multi-hop QA—without adding RL to the summarizer.
 
-### 🎯 **Key Innovation: SFT Summarizer Integration**
+### 🔍 **Motivation**
 
-Our primary contribution is the seamless integration of a **Supervised Fine-Tuned Summarizer** into the Search-R1 pipeline, enabling:
+Retrieval-augmented generation (RAG) systems interleave language model reasoning with external search, but current RL-trained agents (e.g., Search-R1) suffer from:
+- **Context bloat**: concatenating long, noisy documents inflates the prompt, slows decoding, and increases cost.
+- **Multi-turn accumulation**: multi-hop reasoning compounds redundancy as more text is added each turn.
+- **Quality degradation**: irrelevant details distract the policy and make decision-making less reliable.
 
-- 📝 **Intelligent Document Processing**: Automatically summarize long retrieved documents before feeding them to the reasoning model
-- 🧠 **Enhanced Reasoning Capability**: Models can now focus on key information rather than processing entire documents
-- ⚡ **Improved Training Efficiency**: Reduced computational overhead while maintaining reasoning quality
-- 🔄 **End-to-End Optimization**: Complete pipeline from retrieval → summarization → reasoning
+RECON addresses these pain points by compressing retrieved evidence inside the RL loop via a dedicated summarizer. The policy reads only what matters—short, factual, and well-structured summaries—so it reasons faster and more robustly.
 
-### 🚀 **Enhanced Features Over Original Search-R1:**
+### 🧠 **What is RECON?**
 
-- 📝 **SFT Summarizer**: Our core innovation for intelligent text summarization
-- 🔍 **Advanced Retrieval Pipeline**: Enhanced support for multiple search engines
-- 🧠 **Optimized Model Support**: Improved compatibility with various LLM models (Llama3, Qwen2.5, etc.)
-- ⚡ **Streamlined Training**: Refined reinforcement learning methods (PPO, GRPO, etc.)
+RECON (REasoning with CONdensation) is a drop-in augmentation to Search-R1:
+1. At each turn, the agent issues a search query.
+2. Instead of appending raw passages, RECON routes the top-k retrieved docs to a summarizer.
+3. The summarizer produces a concise, clarity-guided summary, which is appended to the context.
+4. The policy model continues reasoning on this compressed, de-noised evidence.
 
-**Search-R1** is a reinforcement learning framework designed for training **reasoning-and-searching interleaved LLMs**—language models that learn to reason and make tool calls (e.g., to search engines) in a coordinated manner.
-
-Built upon [veRL](https://github.com/volcengine/verl), Search-R1 extends the ideas of **DeepSeek-R1(-Zero)** by incorporating interleaved search engine access and provides a fully open-source RL training pipeline. It serves as an alternative and open solution to **OpenAI DeepResearch**, enabling research and development in tool-augmented LLM reasoning.
-
-We support different RL methods (e.g., PPO, GRPO, reinforce), different LLMs (e.g., llama3, Qwen2.5, etc) and different search engines (e.g., local sparse/dense retrievers and online search engines).
-
-Original Papers: [link1](https://arxiv.org/pdf/2503.09516), [link2](https://arxiv.org/abs/2505.15117); Models and Data: [link](https://huggingface.co/collections/PeterJinGo/search-r1-67d1a021202731cb065740f5); Twitter Thread: [link](https://x.com/BowenJin13/status/1895544294473109889); Full Experiment Logs: [prelim](https://wandb.ai/peterjin/Search-R1-open); [v0.1](https://wandb.ai/peterjin/Search-R1-nq_hotpotqa_train); [v0.2](https://wandb.ai/peterjin/Search-R1-v0.2); [v0.3](https://wandb.ai/peterjin/Search-R1-v0.3). Details about these logs and methods can be found [here](https://github.com/PeterGriffinJin/Search-R1/blob/main/docs/experiment_log.md).
+This turns evidence compression into a first-class reasoning tool rather than an offline preprocessing step.
 
 
 
@@ -86,7 +81,7 @@ pip install uvicorn fastapi
 
 ## Quick Start
 
-Train a reasoning + search LLM on NQ dataset with e5 as the retriever and Wikipedia as the corpus.
+Train a reasoning + search LLM on **NQ and HotpotQA dataset combination** with e5 as the retriever and Wikipedia as the corpus.
 
 ### Environment Setup
 
@@ -137,15 +132,39 @@ bash train_ppo.sh
 
 ### Overview
 
-**SFT Summarizer is our core contribution and innovation** in this enhanced Search-R1 framework. This component represents a significant advancement over the original Search-R1 by integrating a Supervised Fine-Tuning (SFT) summarizer into the retrieval pipeline. 
+**RECON's summarizer is our core contribution and innovation** in this enhanced Search-R1 framework. This component represents a significant advancement over the original Search-R1 by integrating a **Two-Stage Summarizer Training (SFT-only)** into the retrieval pipeline.
 
-**Our Innovation Impact:**
-- 🎯 **Novel Architecture**: First to integrate SFT-based summarization into Search-R1's reasoning pipeline
-- 📈 **Performance Enhancement**: Dramatically improves model's ability to process long documents efficiently
-- 🔧 **Seamless Integration**: Maintains Search-R1's original functionality while adding intelligent summarization
-- 🚀 **Production Ready**: Provides RESTful API for easy deployment and integration
+### 🧪 **Core Contributions**
 
-This innovation enables intelligent summarization of retrieved documents, significantly improving the model's understanding and processing capabilities for long documents while maintaining the original Search-R1's reasoning quality.
+#### **1. Active Context Compression for RL-RAG**
+- Introduces an explicit summarization step within the reasoning–retrieval loop.
+- Keeps multi-turn contexts short and focused while preserving task-critical information.
+- Improves interpretability via human-readable, aspect-controlled summaries.
+
+#### **2. Two-Stage Summarizer Training (SFT-only)**
+- **Stage 1 — Relevance Pretraining (MS MARCO)**: train a classifier to separate useful vs. non-useful passages (initialize summarizer with the classification head removed afterward).
+- **Stage 2 — Multi-Aspect Distillation**: distill teacher summaries (GPT-4o-mini) across NQ and HotpotQA, targeted at six aspects: clarity, factual correctness, completeness, coverage, coherence, logicality.
+- After deduplication, this yields ~1.47M training summaries (~1.0M NQ + ~468k HotpotQA).
+- **Final summarizer is SFT-only (no RL on the summarizer)**.
+
+#### **3. Integration with Search-R1 (PPO-only)**
+- We keep the RL backbone and training recipe, but replace raw concatenation with summarization.
+- Deeper retrieval and reasoning become feasible: top-3 → top-5 passages per query; 3 turns → 5 turns maximum.
+- Policy optimization uses PPO only (GAE + KL control, no GRPO).
+
+#### **4. Accuracy and Efficiency Gains**
+- **Accuracy (EM) improves across 7 QA benchmarks**.
+- **Qwen2.5-3B-Base + PPO**: 0.303 → 0.347 (Avg EM, +14.5%).
+- **Qwen2.5-7B-Base + PPO**: 0.431 → 0.444 (Avg EM).
+- **Efficiency (7B backbone)**:
+  - Avg context length: 948.3 → 619.7 tokens.
+  - Avg inference time: 28.79s → 19.9s.
+  - Avg search turns: 2.13 → 1.84.
+- **Training speed**: with Qwen2.5-3B-Base + PPO on 4×H200, 13.9h (RECON, 500 steps) vs 14.7h (Search-R1) → 5.2% faster overall.
+
+#### **5. General and Modular**
+- The summarizer is plug-and-play: it slots between retrieval and policy, and can be improved independently.
+- The summarizer is aspect-aware; you can reweight or ablate aspects (e.g., clarity vs. coverage) without retraining the policy.
 
 ### Launching SFT Summarizer
 
@@ -263,7 +282,7 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summar
 
 | Parameter Category | Parameter Name | Value | Description |
 |-------------------|----------------|-------|-------------|
-| **Data Config** | `data.train_batch_size` | 512 | Training batch size |
+| **Data Config** | `data.train_batch_size` | 512 | Global training batch size |
 | | `data.val_batch_size` | 256 | Validation batch size |
 | | `data.max_prompt_length` | 4096 | Maximum prompt length |
 | | `data.max_response_length` | 500 | Maximum response length |
@@ -275,30 +294,41 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summar
 | | `critic.optim.lr` | 1e-5 | Critic learning rate |
 | | `critic.optim.lr_warmup_steps_ratio` | 0.015 | Critic learning rate warmup ratio |
 | | `algorithm.kl_ctrl.kl_coef` | 0.001 | KL divergence control coefficient |
-| | `algorithm.adv_estimator` | gae | Advantage estimation method |
-| | `algorithm.no_think_rl` | false | Disable think-only RL |
-| **PPO Config** | `actor_rollout_ref.actor.ppo_mini_batch_size` | 256 | PPO mini batch size |
-| | `actor_rollout_ref.actor.ppo_micro_batch_size` | 128 | PPO micro batch size |
-| | `critic.ppo_micro_batch_size` | 16 | Critic PPO micro batch size |
-| **Generation Config** | `actor_rollout_ref.rollout.temperature` | 1 | Generation temperature |
-| | `actor_rollout_ref.rollout.top_p` | 1.0 | Top-p sampling |
+| | `algorithm.adv_estimator` | gae | Advantage estimation method (GAE) |
+| | `algorithm.gamma` | 1.0 | GAE discount factor |
+| | `algorithm.lam` | 1.0 | GAE lambda parameter |
+| **PPO Config** | `actor_rollout_ref.actor.ppo_mini_batch_size` | 256 | PPO optimizer mini-batch size per update |
+| | `actor_rollout_ref.actor.ppo_micro_batch_size` | 128 | Per-device micro batch size (actor) |
+| | `critic.ppo_micro_batch_size` | 16 | Per-device micro batch size (critic) |
+| | `actor_rollout_ref.actor.clip_ratio` | 0.2 | PPO clipping ratio |
+| | `actor_rollout_ref.actor.entropy_coeff` | 0.001 | Entropy regularization coefficient |
+| | `critic.cliprange_value` | 0.5 | Value function clipping range |
+| **Generation Config** | `actor_rollout_ref.rollout.temperature` | 1.0 | Generation temperature (near-deterministic) |
+| | `actor_rollout_ref.rollout.top_p` | 1.0 | Top-p sampling (near-deterministic) |
 | | `actor_rollout_ref.rollout.n_agent` | 1 | Number of agents |
-| | `max_turns` | 5 | Maximum conversation turns |
+| | `max_turns` | 5 | Maximum conversation turns (vs baseline 3) |
 | **Memory Config** | `actor_rollout_ref.rollout.gpu_memory_utilization` | 0.8 | GPU memory utilization |
 | | `actor_rollout_ref.model.enable_gradient_checkpointing` | true | Enable gradient checkpointing |
 | | `actor_rollout_ref.model.use_remove_padding` | True | Remove padding optimization |
-| **FSDP Config** | `actor_rollout_ref.actor.fsdp_config.param_offload` | False | Parameter offloading |
-| | `actor_rollout_ref.actor.fsdp_config.grad_offload` | False | Gradient offloading |
-| | `actor_rollout_ref.actor.fsdp_config.optimizer_offload` | False | Optimizer offloading |
+| **Optimizer Config** | `actor_rollout_ref.actor.optim.weight_decay` | 0.01 | Weight decay (AdamW) |
+| | `actor_rollout_ref.actor.optim.adam_beta1` | 0.9 | Adam beta1 |
+| | `actor_rollout_ref.actor.optim.adam_beta2` | 0.999 | Adam beta2 |
+| | `actor_rollout_ref.actor.optim.adam_eps` | 1e-08 | Adam epsilon |
+| | `actor_rollout_ref.actor.grad_clip` | 1.0 | Gradient clipping |
+| | `critic.grad_clip` | 1.0 | Critic gradient clipping |
 | **Training Config** | `trainer.total_epochs` | 15 | Total training epochs |
-| | `trainer.total_training_steps` | 1005 | Total training steps |
+| | `trainer.total_training_steps` | 1005 | Total training steps (≈67 steps/epoch) |
 | | `trainer.save_freq` | 100 | Model save frequency |
 | | `trainer.test_freq` | 100 | Test frequency |
 | | `trainer.n_gpus_per_node` | 4 | GPUs per node |
 | | `trainer.nnodes` | 1 | Number of nodes |
 | | `trainer.critic_warmup` | 0 | Critic warmup steps |
 | **Retrieval Config** | `retriever.url` | "http://127.0.0.1:8000/retrieve" | Retrieval service address |
-| | `retriever.topk` | 3 | Number of retrieved documents |
+| | `retriever.topk` | 5 | Number of retrieved documents (vs baseline 3) |
+| **Precision Config** | `actor_rollout_ref.model.torch_dtype` | bfloat16 | Training precision |
+| | `actor_rollout_ref.rollout.torch_dtype` | bfloat16 | Inference precision |
+| **Random Seed** | `actor_rollout_ref.actor.megatron.seed` | 1 | Random seed (actor) |
+| | `critic.megatron.seed` | 1 | Random seed (critic) |
 
 ### Starting Training
 
@@ -425,13 +455,36 @@ trainer.n_gpus_per_node=4
    lsof -i :8000
 ```
 
-## Preliminary results
+## Results
 
-(1) The base model (llama3.2-3b-base) learns to call the search engine and obtain improved performance.
+### 📊 **Accuracy (Exact Match)**
 
+#### **Qwen2.5-3B-Base + PPO**
+- **Search-R1**: 0.303 → **RECON**: 0.347 (+14.5%)
+- Gains strongest on multi-hop datasets (HotpotQA, 2Wiki, MuSiQue, Bamboogle)
 
+#### **Qwen2.5-7B-Base + PPO**
+- **Search-R1**: 0.431 → **RECON**: 0.444
 
-(2) The base model (Qwen2.5-7b-base) can learn to conduct multi-turn search engine calling and reasoning with RL.
+### ⚡ **Efficiency (Qwen2.5-7B-Base + PPO)**
+- **Avg context length**: 948.27 → 619.7 tokens
+- **Avg inference time**: 28.79s → 19.9s
+- **Avg search turns**: 2.13 → 1.84
+
+### 🚀 **Training Speed**
+- **3B on 4× H200, 500 steps**: RECON 13.9h vs Search-R1 14.7h (≈5.2% faster)
+
+### 🧪 **Ablations**
+#### **Instruct vs Base (3B)**
+- **Search-R1 → RECON (Avg EM)**:
+  - **Base**: 0.303 → 0.347
+  - **Instruct**: 0.325 → 0.336
+- RECON helps both, with larger gains on Base (smaller backbones benefit more from compression)
+
+### 🧩 **Why It Works**
+- **Less noise, more signal**: Summaries remove redundancy and keep only task-relevant evidence, improving the signal-to-noise ratio for the policy.
+- **Better multi-turn scaling**: Shorter contexts allow more turns and deeper retrieval without hitting length limits or latency cliffs.
+- **Grounded reasoning**: Explicit summaries encourage the policy to anchor each step on external evidence, improving reliability over purely generative chains.
 
 
 ## Inference
@@ -518,13 +571,14 @@ You can refer to ```search_r1/search/retriever_server.py``` for an example of la
 - ✅ Multiple reinforcement learning methods (PPO, GRPO, reinforce)
 - ✅ Multi-GPU and multi-node training support
 
-### 📝 SFT Summarizer Features (Our Core Innovation & Contribution)
-- ✅ **🎯 Novel Architecture**: First implementation of SFT-based summarization in Search-R1 framework
-- ✅ **📈 Performance Breakthrough**: Intelligent document summarization with significant efficiency gains
-- ✅ **🔧 Seamless Integration**: Perfect integration with retrieval pipeline, maintaining original functionality
+### 📝 RECON Summarizer Features (Our Core Innovation & Contribution)
+- ✅ **🎯 Novel Architecture**: First implementation of active context compression within RL-RAG loop
+- ✅ **📈 Performance Breakthrough**: Two-stage SFT training (MS MARCO relevance → multi-aspect distillation)
+- ✅ **🔧 Seamless Integration**: Drop-in augmentation to Search-R1 with PPO-only policy optimization
 - ✅ **🚀 Production-Ready API**: RESTful API for retrieval and summarization services
 - ✅ **⚡ GPU Optimization**: GPU-accelerated summarization generation for real-time processing
-- ✅ **🎛️ Advanced Configurability**: Support for custom summarization length and style parameters
+- ✅ **🎛️ Aspect-Aware Control**: Six controlled aspects (clarity, factual correctness, completeness, coverage, coherence, logicality)
+- ✅ **🔌 Modular Design**: Plug-and-play summarizer that can be improved independently
 
 ### 🚀 Training Features
 - ✅ **End-to-End Training**: Complete training pipeline from retrieval to summarization to reasoning
@@ -534,35 +588,35 @@ You can refer to ```search_r1/search/retriever_server.py``` for an example of la
 
 ## Our Contributions
 
-### 🎯 **Primary Innovation: SFT Summarizer Integration**
+### 🎯 **Primary Innovation: Active Context Compression for RL-RAG**
 
-Our main contribution to the Search-R1 ecosystem is the development and integration of a **Supervised Fine-Tuned Summarizer** that significantly enhances the original framework's capabilities:
+Our main contribution to the Search-R1 ecosystem is the development and integration of **RECON (REasoning with CONdensation)** that significantly enhances the original framework's capabilities:
 
 #### **Technical Contributions:**
-- 🔬 **Novel Architecture**: First to implement SFT-based summarization within Search-R1's reasoning pipeline
-- 📊 **Performance Optimization**: Reduced computational overhead while maintaining reasoning quality
-- 🔧 **Seamless Integration**: Maintained backward compatibility with original Search-R1 functionality
-- 🚀 **Production Deployment**: Developed RESTful API for easy integration and deployment
+- 🔬 **Novel Architecture**: First to implement active context compression within the RL reasoning–retrieval loop
+- 📊 **Two-Stage Training**: MS MARCO relevance pretraining → multi-aspect distillation (SFT-only, no RL on summarizer)
+- 🔧 **Seamless Integration**: Drop-in augmentation maintaining Search-R1's PPO backbone and training recipe
+- 🚀 **Production Deployment**: RESTful API for easy integration and deployment
 
 #### **Research Impact:**
-- 📈 **Enhanced Efficiency**: Models can now process long documents more efficiently through intelligent summarization
-- 🧠 **Improved Reasoning**: Better focus on key information rather than processing entire documents
-- 🔄 **End-to-End Pipeline**: Complete optimization from retrieval → summarization → reasoning
-- ⚡ **Scalability**: GPU-accelerated processing for real-time applications
+- 📈 **Accuracy Gains**: 3B: 0.303 → 0.347 (+14.5%); 7B: 0.431 → 0.444 (Avg EM across 7 datasets)
+- ⚡ **Efficiency Gains**: Context 948 → 620 tokens; latency 28.79s → 19.9s; turns 2.13 → 1.84
+- 🚀 **Training Speed**: 5.2% faster wall-clock vs Search-R1 despite extra summarization step
+- 🔄 **Deeper Retrieval**: top-3 → top-5 passages per query; 3 → 5 turns maximum
 
 #### **Implementation Highlights:**
 - **File**: `retrieval_with_summarizer_launch.sh` - Our custom launch script
-- **File**: `retrieval_with_summarizer.py` - Core SFT Summarizer implementation
+- **File**: `retrieval_with_summarizer.py` - Core RECON summarizer implementation
 - **Configuration**: Enhanced `train_ppo.sh` with summarizer integration
 - **Documentation**: Comprehensive usage guides and API documentation
 
 ### 🏆 **Impact on Search-R1 Community**
 
 Our enhancement makes Search-R1 more practical for real-world applications by:
-- Reducing computational costs for long document processing
-- Improving reasoning quality through focused information extraction
-- Providing production-ready deployment options
-- Maintaining the original framework's research capabilities
+- **Solving context bloat**: Compressing noisy documents to improve signal-to-noise ratio
+- **Enabling multi-turn scaling**: Shorter contexts allow more turns without hitting length limits
+- **Providing grounded reasoning**: Explicit summaries anchor policy decisions on external evidence
+- **Maintaining modularity**: Plug-and-play summarizer can be improved independently
 
 ## Acknowledgments
 
