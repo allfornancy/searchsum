@@ -235,31 +235,6 @@ During training, the model uses SFT Summarizer in the following way:
 3. **Intelligent Summarization**: SFT Summarizer summarizes retrieved documents
 4. **Reasoning Generation**: Performs reasoning and answering based on summarized content
 
-### Troubleshooting
-
-#### Common Issues
-
-1. **GPU Memory Insufficient**
-   ```bash
-   # Reduce batch size or use smaller model
-   export CUDA_VISIBLE_DEVICES=0  # Use different GPU
-   ```
-
-2. **Port Already in Use**
-   ```bash
-   # Check port usage
-   lsof -i :8000
-   
-   # Kill process using the port
-   kill -9 <PID>
-   ```
-
-3. **Model Loading Failed**
-   ```bash
-   # Check model path and permissions
-   ls -la /path/to/model
-   ```
-
 ## Training Configuration
 
 **Reward:** Exact-match (EM) computed on the final answer.  
@@ -437,41 +412,6 @@ trainer.nnodes=2
 # Set GPUs per node
 trainer.n_gpus_per_node=4
 ```
-
-### Troubleshooting
-
-#### Common Training Issues
-
-1. **Insufficient Memory**
-   ```bash
-   # Reduce batch size
-   data.train_batch_size=256
-   actor_rollout_ref.actor.ppo_micro_batch_size=64
-   ```
-
-2. **Slow Training Speed**
-   ```bash
-   # Enable gradient checkpointing
-   actor_rollout_ref.model.enable_gradient_checkpointing=true
-   
-# (Optional) If using xFormers in your own inference stack, enable it via framework-specific configs.
-# vLLM users generally do not set `VLLM_ATTENTION_BACKEND` directly.
-   ```
-
-3. **Retrieval Service Connection Failed**
-   ```bash
-   # Try the root endpoint first (almost always works):
-   curl http://127.0.0.1:8000/
-   
-   # If your server exposes a health endpoint:
-   curl http://127.0.0.1:8000/health
-   
-   # Or check the API docs:
-   # open http://127.0.0.1:8000/docs in a browser
-   
-   # Check port usage
-   lsof -i :8000
-   ```
 
 ## Results
 
