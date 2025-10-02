@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-**TL;DR.** We extend the Search-R1 reinforcement-learning framework by inserting a learned summarization module into the reasoning–retrieval loop. Instead of concatenating raw retrieved documents, RECON first condenses evidence into short, clarity-guided summaries and then reasons over the compressed context. This active context compression improves accuracy and efficiency at the same time—especially for multi-hop QA—without adding RL to the summarizer.
+**TL;DR.** We extend the Search-R1 reinforcement-learning framework by inserting a learned summarization module into the reasoning-retrieval loop. Instead of concatenating raw retrieved documents, RECON first condenses evidence into short, clarity-guided summaries and then reasons over the compressed context. This active context compression improves accuracy and efficiency at the same time—especially for multi-hop QA—using only SFT-trained summarizers.
 
 ### 🔍 **Motivation**
 
