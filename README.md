@@ -98,6 +98,11 @@ gzip -d $save_path/wiki-18.jsonl.gz
 python scripts/data_process/nq_search.py
 ```
 
+(2b) Process the HotpotQA dataset.
+```bash
+python scripts/data_process/hotpotqa_search.py
+```
+
 ### Launch Services
 
 (3) Launch a local retrieval server.
@@ -208,12 +213,13 @@ POST http://127.0.0.1:8000/retrieve
 Content-Type: application/json
 
 {
-    "query": "Your query question",
-    "topk": 3
+    "queries": ["Your query question"],
+    "topk": 5,
+    "return_scores": false
 }
 ```
 
-#### 2. Summarize Only
+#### 2. Summarize Only (Optional)
 ```bash
 POST http://127.0.0.1:8000/summarize
 Content-Type: application/json
@@ -259,6 +265,8 @@ During training, the model uses SFT Summarizer in the following way:
 
 ## Training Configuration
 
+**Reward:** exact-match (EM) on the final answer; retrieved tokens are masked from the loss.
+
 ### Training Script Overview
 
 This project uses the `train_ppo.sh` script for PPO reinforcement learning training with the following main configurations:
@@ -272,7 +280,9 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 export DATA_DIR='data/nq_hotpotqa_train'
 
 # Base model
-export BASE_MODEL='/mnt/nvme_data/Qwen2.5-3B-Instruct'
+export BASE_MODEL='/mnt/nvme_data/Qwen2.5-3B-Base'
+# (Optional) For ablation:
+# export BASE_MODEL='/mnt/nvme_data/Qwen2.5-3B-Instruct'
 
 # Experiment name
 export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summarizer
@@ -324,7 +334,7 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summar
 | | `trainer.nnodes` | 1 | Number of nodes |
 | | `trainer.critic_warmup` | 0 | Critic warmup steps |
 | **Retrieval Config** | `retriever.url` | "http://127.0.0.1:8000/retrieve" | Retrieval service address |
-| | `retriever.topk` | 5 | Number of retrieved documents (vs baseline 3) |
+| | `retriever.topk` | 5 | Number of retrieved documents (ours; baseline uses top-3) |
 | **Precision Config** | `actor_rollout_ref.model.torch_dtype` | bfloat16 | Training precision |
 | | `actor_rollout_ref.rollout.torch_dtype` | bfloat16 | Inference precision |
 | **Random Seed** | `actor_rollout_ref.actor.megatron.seed` | 1 | Random seed (actor) |
@@ -403,7 +413,7 @@ trainer.total_training_steps=2000  # More training steps
 retriever.url="http://127.0.0.1:8001/retrieve"  # Different port
 
 # Modify number of retrieved documents
-retriever.topk=5  # Retrieve more documents
+retriever.topk=5  # Ours (baseline uses top-3)
 ```
 
 ### Multi-GPU Training
@@ -442,8 +452,8 @@ trainer.n_gpus_per_node=4
    # Enable gradient checkpointing
    actor_rollout_ref.model.enable_gradient_checkpointing=true
    
-   # Use XFORMERS backend
-   export VLLM_ATTENTION_BACKEND=XFORMERS
+# (Optional) If using xFormers in your own inference stack, enable it via framework-specific configs.
+# vLLM users generally do not set `VLLM_ATTENTION_BACKEND` directly.
    ```
 
 3. **Retrieval Service Connection Failed**
@@ -591,6 +601,14 @@ You can refer to ```search_r1/search/retriever_server.py``` for an example of la
 ### 🎯 **Primary Innovation: Active Context Compression for RL-RAG**
 
 Our main contribution to the Search-R1 ecosystem is the development and integration of **RECON (REasoning with CONdensation)** that significantly enhances the original framework's capabilities:
+
+#### **Key Differences from Search-R1 Baseline:**
+
+| Aspect | Search-R1 (baseline) | RECON (ours) |
+|--------|---------------------|-------------|
+| Max turns | 3 | **5** |
+| Retriever top-k | 3 | **5** |
+| Evidence handling | Raw concat | **Summarize-then-reason** |
 
 #### **Technical Contributions:**
 - 🔬 **Novel Architecture**: First to implement active context compression within the RL reasoning–retrieval loop
