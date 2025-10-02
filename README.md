@@ -26,7 +26,6 @@ This turns evidence compression into a first-class reasoning tool rather than an
 - [Training Configuration](#training-configuration)
 - [Results](#results)
 - [Inference](#inference)
-- [Use Your Own Dataset](#use-your-own-dataset)
 - [Features](#features)
 - [Acknowledgments](#acknowledgments)
 - [Citations](#citations)
@@ -463,52 +462,6 @@ conda activate searchr1
 python infer.py
 ```
 You can modify the ```question``` on line 7 to something you're interested in.
-
-## Use your own dataset
-
-### QA data
-For each question-answer sample, it should be a dictionary containing the desired content as below:
-
-```
-data = {
-        "data_source": data_source,
-        "prompt": [{
-            "role": "user",
-            "content": question,
-        }],
-        "ability": "fact-reasoning",
-        "reward_model": {
-            "style": "rule",
-            "ground_truth": solution
-        },
-        "extra_info": {
-            'split': split,
-            'index': idx,
-        }
-    }
-```
-
-You can refer to ```scripts/data_process/nq_search.py``` for a concrete data processing example.
-
-### Corpora
-
-It is recommended to make your corpus a jsonl file, where each line (a dictionary with "id" key and "contents" key) corresponds to one passage. You can refer to ```example/corpus.jsonl``` for an example.
-
-The "id" key corresponds to the passage id, while the "contents" key corresponds to the passage content ('"' + title + '"\n' + text).
-For example:
-```
-{"id": "0", "contents": "Evan Morris Evan L. Morris (January 26, 1977 \u2013 July 9, 2015) was a lobbyist for Genentech and its parent corporation Roche in Washington."}
-...
-{"id": "100", "contents": "Three years later, when the United States Exploring Expedition to little-known portions of the globe was organised under Charles Wilkes, Hale was recommended, while yet an undergraduate."}
-...
-```
-
-**Index your corpora (optional).**
-If you would like to use a local retriever as the search engine, you can index your own corpus by:
-```
-bash search_r1/search/build_index.sh
-```
-You can change ```retriever_name``` and ```retriever_model``` to your interested off-the-shelf retriever.
 
 ## Features
 
