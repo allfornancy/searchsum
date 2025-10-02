@@ -33,7 +33,7 @@ This turns evidence compression into a first-class reasoning tool rather than an
 - [Quick Start](#quick-start)
 - [SFT Summarizer Usage](#sft-summarizer-usage)
 - [Training Configuration](#training-configuration)
-- [Preliminary Results](#preliminary-results)
+- [Results](#results)
 - [Inference](#inference)
 - [Use Your Own Dataset](#use-your-own-dataset)
 - [Use Your Own Search Engine](#use-your-own-search-engine)
@@ -44,7 +44,7 @@ This turns evidence compression into a first-class reasoning tool rather than an
 
 ## Installation
 
-### Search-r1 environment
+### Search-R1 environment
 ```bash
 conda create -n searchr1 python=3.9
 conda activate searchr1
@@ -62,7 +62,7 @@ pip install wandb
 ```
 
 ### Retriever environment (optional)
-If you would like to call a local retriever as the search engine, you can install the environment as follows. (We recommend using a seperate environment.)
+If you would like to call a local retriever as the search engine, you can install the environment as follows. (We recommend using a separate environment.)
 ```bash
 conda create -n retriever python=3.10
 conda activate retriever
@@ -122,7 +122,7 @@ bash retrieval_with_summarizer_launch.sh
 ### Start Training
 
 (5) Run RL training (PPO) with Qwen2.5-3B-Base.
-# (Optional) For ablation, switch to Qwen2.5-3B-Instruct.
+*(Optional) For ablation, switch to Qwen2.5-3B-Instruct.*
 ```bash
 conda activate searchr1
 bash train_ppo.sh
@@ -208,6 +208,7 @@ Main configuration parameters for SFT Summarizer:
 - **Retriever**: Uses e5-base-v2 model for document retrieval
 - **Summarizer**: Integrates SFT-trained summarization model
 - **Deployment**: For separate machines/GPUs, adjust `CUDA_VISIBLE_DEVICES` and URL accordingly
+- **Memory Management**: When co-locating services with training, we set `gpu_memory_utilization=0.8` for the policy to leave ~20% headroom for the services on the same GPUs
 
 ### API Endpoints
 
@@ -481,12 +482,14 @@ trainer.n_gpus_per_node=4
 
 3. **Retrieval Service Connection Failed**
    ```bash
+   # Try the root endpoint first (almost always works):
+   curl http://127.0.0.1:8000/
+   
    # If your server exposes a health endpoint:
    curl http://127.0.0.1:8000/health
    
-   # Otherwise try the root or docs:
-   curl http://127.0.0.1:8000/
-   # or open http://127.0.0.1:8000/docs in a browser
+   # Or check the API docs:
+   # open http://127.0.0.1:8000/docs in a browser
    
    # Check port usage
    lsof -i :8000
@@ -510,7 +513,7 @@ trainer.n_gpus_per_node=4
 - **Avg inference time**: 28.79s → 19.9s
 - **Avg search turns**: 2.13 → 1.84
 
-(Averages are computed over the same 7 datasets as in Table 3 of the paper.)
+*(Averages computed over the same 7 datasets as in the paper's main table.)*
 
 ### 🚀 **Training Speed**
 - **3B on 4× H200, 500 steps**: RECON 13.9h vs Search-R1 14.7h (≈5.2% faster)
