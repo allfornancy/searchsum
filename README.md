@@ -29,7 +29,6 @@ This turns evidence compression into a first-class reasoning tool rather than an
 - [Use Your Own Dataset](#use-your-own-dataset)
 - [Use Your Own Search Engine](#use-your-own-search-engine)
 - [Features](#features)
-- [Our Contributions](#our-contributions)
 - [Acknowledgments](#acknowledgments)
 - [Citations](#citations)
 
@@ -549,46 +548,6 @@ You can refer to ```search_r1/search/retriever_server.py``` for an example of la
 - ✅ **Reinforcement Learning**: Uses PPO and other algorithms to optimize search and reasoning capabilities
 - ✅ **Multi-turn Dialogue**: Support for multi-turn search and reasoning interactions
 - ✅ **Real-time Monitoring**: Complete training logs and checkpoint management
-
-## Our Contributions
-
-### 🎯 **Primary Innovation: Active Context Compression for RL-RAG**
-
-Our main contribution to the Search-R1 ecosystem is the development and integration of **RECON (REasoning with CONdensation)** that significantly enhances the original framework's capabilities:
-
-#### **Key Differences from Search-R1 Baseline:**
-
-| Aspect | Search-R1 (baseline) | RECON (ours) |
-|--------|---------------------|-------------|
-| Max turns | 3 | **5** |
-| Retriever top-k | 3 | **5** |
-| Evidence handling | Raw concat | **Summarize-then-reason** |
-
-#### **Technical Contributions:**
-- 🔬 **Novel Architecture**: First to implement active context compression within the RL reasoning–retrieval loop
-- 📊 **Two-Stage Training**: MS MARCO relevance pretraining → multi-aspect distillation (SFT-only, no RL on summarizer)
-- 🔧 **Seamless Integration**: Drop-in augmentation maintaining Search-R1's PPO backbone and training recipe
-- 🚀 **Production Deployment**: RESTful API for easy integration and deployment
-
-#### **Research Impact:**
-- 📈 **Accuracy Gains**: 3B: 0.303 → 0.347 (+14.5%); 7B: 0.431 → 0.444 (Avg EM across 7 datasets)
-- ⚡ **Efficiency Gains**: Context 948 → 620 tokens; latency 28.79s → 19.9s; turns 2.13 → 1.84
-- 🚀 **Training Speed**: 5.2% faster wall-clock vs Search-R1 despite extra summarization step
-- 🔄 **Deeper Retrieval**: top-3 → top-5 passages per query; 3 → 5 turns maximum
-
-#### **Implementation Highlights:**
-- **File**: `retrieval_with_summarizer_launch.sh` - Our custom launch script
-- **File**: `retrieval_with_summarizer.py` - Core RECON summarizer implementation
-- **Configuration**: Enhanced `train_ppo.sh` with summarizer integration
-- **Documentation**: Comprehensive usage guides and API documentation
-
-### 🏆 **Impact on Search-R1 Community**
-
-Our enhancement makes Search-R1 more practical for real-world applications by:
-- **Solving context bloat**: Compressing noisy documents to improve signal-to-noise ratio
-- **Enabling multi-turn scaling**: Shorter contexts allow more turns without hitting length limits
-- **Providing grounded reasoning**: Explicit summaries anchor policy decisions on external evidence
-- **Maintaining modularity**: Plug-and-play summarizer can be improved independently
 
 ## Acknowledgments
 
