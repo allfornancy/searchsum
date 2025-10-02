@@ -24,7 +24,6 @@ This turns evidence compression into a first-class reasoning tool rather than an
 - [Quick Start](#quick-start)
 - [SFT Summarizer Usage](#sft-summarizer-usage)
 - [Training Configuration](#training-configuration)
-- [Results](#results)
 - [Inference](#inference)
 - [Features](#features)
 - [Acknowledgments](#acknowledgments)
@@ -365,44 +364,6 @@ trainer.nnodes=2
 # Set GPUs per node
 trainer.n_gpus_per_node=4
 ```
-
-## Results
-
-### 📊 **Accuracy (Exact Match)**
-
-#### **Qwen2.5-3B-Base + PPO**
-- **Search-R1**: 0.303 → **RECON**: 0.347 (+14.5%)
-- Gains strongest on multi-hop datasets (HotpotQA, 2Wiki, MuSiQue, Bamboogle)
-
-#### **Qwen2.5-7B-Base + PPO**
-- **Search-R1**: 0.431 → **RECON**: 0.444
-
-*(Averages computed over the same 7 datasets as in the paper's main table.)*
-
-### ⚡ **Efficiency (Qwen2.5-7B-Base + PPO)**
-- **Avg context length**: 948.27 → 619.7 tokens
-- **Avg inference time**: 28.79s → 19.9s
-- **Avg search turns**: 2.13 → 1.84
-
-*(Averages computed over the same 7 datasets as in the paper's main table.)*
-
-### 🚀 **Training Speed**
-- **3B on 4× H200, 500 steps**: RECON 13.9h vs Search-R1 14.7h (≈5.2% faster)
-
-*(Timing measured on a 500-step run; full training runs in the paper use 1005 steps / 15 epochs.)*
-
-### 🧪 **Ablations**
-#### **Instruct vs Base (3B)**
-- **Search-R1 → RECON (Avg EM)**:
-  - **Base**: 0.303 → 0.347
-  - **Instruct**: 0.325 → 0.336
-- RECON helps both, with larger gains on Base (smaller backbones benefit more from compression)
-
-### 🧩 **Why It Works**
-- **Less noise, more signal**: Summaries remove redundancy and keep only task-relevant evidence, improving the signal-to-noise ratio for the policy.
-- **Better multi-turn scaling**: Shorter contexts allow more turns and deeper retrieval without hitting length limits or latency cliffs.
-- **Grounded reasoning**: Explicit summaries encourage the policy to anchor each step on external evidence, improving reliability over purely generative chains.
-
 
 ## Inference
 #### You can play with the trained Search-R1 model with your own question.
