@@ -27,7 +27,6 @@ This turns evidence compression into a first-class reasoning tool rather than an
 - [Results](#results)
 - [Inference](#inference)
 - [Use Your Own Dataset](#use-your-own-dataset)
-- [Use Your Own Search Engine](#use-your-own-search-engine)
 - [Features](#features)
 - [Acknowledgments](#acknowledgments)
 - [Citations](#citations)
@@ -510,16 +509,6 @@ If you would like to use a local retriever as the search engine, you can index y
 bash search_r1/search/build_index.sh
 ```
 You can change ```retriever_name``` and ```retriever_model``` to your interested off-the-shelf retriever.
-
-## Use your own search engine
-
-Our codebase supports local sparse retriever (e.g., BM25), local dense retriever (both flat indexing with GPUs and ANN indexing with CPUs) and online search engine (e.g., Google, Bing, etc). More details can be found [here](https://github.com/PeterGriffinJin/Search-R1/tree/main/docs/retriever.md).
-
-The main philosophy is to launch a local or remote search engine server separately from the main RL training pipeline. 
-
-The LLM can call the search engine by calling the search API (e.g., "http://127.0.0.1:8000/retrieve").
-
-You can refer to ```search_r1/search/retriever_server.py``` for an example of launching a local retriever server.
 
 ## Features
 
