@@ -1,7 +1,6 @@
 # Search-R1 with SFT Summarizer: Enhanced Reasoning and Search Training Framework
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/PeterGriffinJin/Search-R1/main/public/logo.png" alt="logo" width="300"/>
 </div>
 
 <p align="center">
