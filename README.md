@@ -54,60 +54,92 @@ pip install wandb
 
 ## Quick Start
 
-Train a reasoning + search LLM on **NQ and HotpotQA dataset combination** with e5 as the retriever and Wikipedia as the corpus.
+This guide shows how to train RECON (Search-R1 with SFT Summarizer) on **NQ and HotpotQA datasets**.
 
-### Environment Setup
+### Prerequisites
 
-(1) Download the indexing and corpus.
+- **Hardware**: 4× H200/A100 GPUs (or similar)
+- **Models**: Qwen2.5-3B-Base (or Qwen2.5-3B-Instruct for ablation)
+- **Data**: NQ + HotpotQA training data (already processed in `data/nq_hotpotqa_train/`)
+
+### Step 1: Environment Setup
+
 ```bash
-save_path=/the/path/to/save
-python scripts/download.py --save_path $save_path
-cat $save_path/part_* > $save_path/e5_Flat.index
-gzip -d $save_path/wiki-18.jsonl.gz
-```
+# Clone the repository
+git clone https://github.com/allfornancy/searchsum.git
+cd searchsum
 
-(2) Process the NQ dataset.
-```bash
-python scripts/data_process/nq_search.py
-```
-
-(2b) Process the HotpotQA dataset.
-```bash
-python scripts/data_process/hotpotqa_search.py
-```
-
-> Run **both** preprocessing steps if you train on the combined NQ + HotpotQA mixture.
-
-### Launch Services
-
-(3) Launch a local retrieval server.
-```bash
-conda activate retriever
-bash retrieval_launch.sh
-```
-
-(4) **Launch SFT Summarizer server** (New feature in this project).
-```bash
-conda activate retriever
-bash retrieval_with_summarizer_launch.sh
-```
-
-### Start Training
-
-(5) Run RL training (PPO) with Qwen2.5-3B-Base.
-*(Optional) For ablation, switch to Qwen2.5-3B-Instruct.*
-```bash
+# Create conda environment
+conda create -n searchr1 python=3.9
 conda activate searchr1
+
+# Install PyTorch (adjust CUDA version as needed)
+pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cu121
+
+# Install project dependencies
+pip install -e .
+
+# Install additional requirements
+pip install flash-attn --no-build-isolation
+pip install wandb
+```
+
+### Step 2: Download Corpus and Build Index
+
+```bash
+# Set your data path
+export DATA_PATH=/path/to/your/data
+
+# Download Wikipedia corpus and build FAISS index
+python scripts/download.py --save_path $DATA_PATH
+cat $DATA_PATH/part_* > $DATA_PATH/e5_Flat.index
+gzip -d $DATA_PATH/wiki-18.jsonl.gz
+```
+
+### Step 3: Launch Retrieval Server
+
+```bash
+# Update paths in retrieval_launch.sh
+file_path=$DATA_PATH
+index_file=$file_path/e5_Flat.index
+corpus_file=$file_path/wiki-18.jsonl
+retriever_name=e5
+retriever_path=intfloat/e5-base-v2
+
+# Launch retrieval server
+python search_r1/search/retrieval_server.py --index_path $index_file \
+                                            --corpus_path $corpus_file \
+                                            --topk 5 \
+                                            --retriever_name $retriever_name \
+                                            --retriever_model $retriever_path \
+                                            --faiss_gpu
+```
+
+### Step 4: Start Training
+
+```bash
+# Set environment variables
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+export BASE_MODEL='/path/to/Qwen2.5-3B-Base'  # or Qwen2.5-3B-Instruct
+export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-base-v0.2-summarizer
+
+# Run training
 bash train_ppo.sh
 ```
 
-### Service Descriptions
+### Training Configuration
 
-- **Retrieval Server** (`retrieval_launch.sh`): Launches basic retrieval service
-- **SFT Summarizer Server** (`retrieval_with_summarizer_launch.sh`): Launches retrieval service integrated with SFT summarizer
-- **Training Script** (`train_ppo.sh`): Launches PPO reinforcement learning training
+**Key Parameters:**
+- **Model**: Qwen2.5-3B-Base (default) or Qwen2.5-3B-Instruct (ablation)
+- **Training Data**: NQ + HotpotQA (`data/nq_hotpotqa_train/`)
+- **Retriever**: e5-base-v2 with FAISS-GPU
+- **Max Turns**: 5 (vs. Search-R1 baseline's 3)
+- **Top-k**: 5 (vs. Search-R1 baseline's 3)
+- **Training Steps**: 1005 steps / 15 epochs
+- **GPUs**: 4× H200/A100
 
-> **Note**: Ensure that both the retrieval server and SFT Summarizer server are running properly before starting training.
+**Reward:** Exact-match (EM) computed on the final answer.  
+**Loss masking:** Only LLM-generated tokens (reasoning, queries, answers) are optimized; retrieved evidence tokens are masked out of the loss.
 
 ## SFT Summarizer Usage
 
