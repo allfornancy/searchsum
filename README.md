@@ -260,59 +260,15 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-base-v0.2-summarizer
 
 #### Training Parameters Details
 
-| Parameter Category | Parameter Name | Value | Description |
-|-------------------|----------------|-------|-------------|
-| **Data Config** | `data.train_batch_size` | 512 | Global training batch size |
-| | `data.val_batch_size` | 256 | Validation batch size |
-| | `data.max_prompt_length` | 4096 | Maximum prompt length |
-| | `data.max_response_length` | 500 | Maximum response length |
-| | `data.max_start_length` | 2048 | Maximum start sequence length |
-| | `data.max_obs_length` | 500 | Maximum observation length |
-| | `data.shuffle_train_dataloader` | True | Shuffle training data |
-| **Model Config** | `actor_rollout_ref.actor.optim.lr` | 1e-6 | Actor learning rate |
-| | `actor_rollout_ref.actor.optim.lr_warmup_steps_ratio` | 0.285 | Actor learning rate warmup ratio |
-| | `critic.optim.lr` | 1e-5 | Critic learning rate |
-| | `critic.optim.lr_warmup_steps_ratio` | 0.015 | Critic learning rate warmup ratio |
-| | `algorithm.kl_ctrl.kl_coef` | 0.001 | KL divergence control coefficient |
-| | `algorithm.adv_estimator` | gae | Advantage estimation method (GAE) |
-| | `algorithm.gamma` | 1.0 | GAE discount factor |
-| | `algorithm.lam` | 1.0 | GAE lambda parameter |
-| **PPO Config** | `actor_rollout_ref.actor.ppo_mini_batch_size` | 256 | PPO optimizer mini-batch size per update |
-| | `actor_rollout_ref.actor.ppo_micro_batch_size` | 128 | Per-device micro batch size (actor) |
-| | `critic.ppo_micro_batch_size` | 16 | Per-device micro batch size (critic) |
-| | `actor_rollout_ref.actor.clip_ratio` | 0.2 | PPO clipping ratio |
-| | `actor_rollout_ref.actor.entropy_coeff` | 0.001 | Entropy regularization coefficient |
-| | `critic.cliprange_value` | 0.5 | Value function clipping range |
-| **Generation Config** | `actor_rollout_ref.rollout.temperature` | 1.0 | Generation temperature (near-deterministic) |
-| | `actor_rollout_ref.rollout.top_p` | 1.0 | Top-p sampling (near-deterministic) |
-| | `actor_rollout_ref.rollout.n_agent` | 1 | Number of agents |
-| | `max_turns` | 5 | Maximum conversation turns (vs baseline 3) |
-
-> We match Search-R1's decoding recipe (temperature=1.0, top-p=1.0) for apples-to-apples comparison; despite not being greedy (temp=0), this behaves stably in our setup.
-| **Memory Config** | `actor_rollout_ref.rollout.gpu_memory_utilization` | 0.8 | GPU memory utilization |
-| | `actor_rollout_ref.model.enable_gradient_checkpointing` | true | Enable gradient checkpointing |
-| | `actor_rollout_ref.model.use_remove_padding` | True | Remove padding optimization |
-| **Optimizer Config** | `actor_rollout_ref.actor.optim.weight_decay` | 0.01 | Weight decay (AdamW) |
-| | `actor_rollout_ref.actor.optim.adam_beta1` | 0.9 | Adam beta1 |
-| | `actor_rollout_ref.actor.optim.adam_beta2` | 0.999 | Adam beta2 |
-| | `actor_rollout_ref.actor.optim.adam_eps` | 1e-08 | Adam epsilon |
-| | `actor_rollout_ref.actor.grad_clip` | 1.0 | Gradient clipping |
-| | `critic.grad_clip` | 1.0 | Critic gradient clipping |
-| **Training Config** | `trainer.total_epochs` | 15 | Total training epochs |
-| | `trainer.total_training_steps` | 1005 | Total training steps (≈67 steps/epoch) |
-| | `trainer.save_freq` | 100 | Model save frequency |
-| | `trainer.test_freq` | 100 | Test frequency |
-| | `trainer.n_gpus_per_node` | 4 | GPUs per node |
-| | `trainer.nnodes` | 1 | Number of nodes |
-| | `trainer.critic_warmup` | 0 | Critic warmup steps |
-| **Retrieval Config** | `retriever.url` | "http://127.0.0.1:8000/retrieve" | Retrieval service address |
-| | `retriever.topk` | 5 | Number of retrieved documents (ours; baseline uses top-3) |
-
-> Note: The original Search-R1 baseline uses `topk=3` and `max_turns=3`; RECON uses `topk=5` and `max_turns=5`.
-| **Precision Config** | `actor_rollout_ref.model.torch_dtype` | bfloat16 | Training precision |
-| | `actor_rollout_ref.rollout.torch_dtype` | bfloat16 | Inference precision |
-| **Random Seed** | `actor_rollout_ref.actor.megatron.seed` | 1 | Random seed (actor) |
-| | `critic.megatron.seed` | 1 | Random seed (critic) |
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| **Learning Rates** | Actor: 1e-6, Critic: 1e-5 | Actor and critic learning rates |
+| **Batch Sizes** | Global: 512, Mini: 256, Micro: 128/16 | Training batch configuration |
+| **Sequence Lengths** | Prompt: 4096, Response: 500 | Maximum sequence lengths |
+| **PPO Config** | KL coeff: 0.001, Clip ratio: 0.2 | PPO hyperparameters |
+| **Generation** | Temperature: 1.0, Top-p: 1.0 | Near-deterministic generation |
+| **Training** | Epochs: 15, Steps: 1005 | Training schedule |
+| **Retrieval** | Top-k: 5, Max turns: 5 | Enhanced retrieval (vs baseline top-3, 3 turns) |
 
 ### Starting Training
 
