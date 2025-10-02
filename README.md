@@ -203,17 +203,18 @@ python search_r1/search/retrieval_with_summarizer.py
 
 Main configuration parameters for SFT Summarizer:
 
-- **GPU Device**: Default uses `CUDA_VISIBLE_DEVICES=4`
+- **GPU Device**: Default uses `CUDA_VISIBLE_DEVICES=4` (same-machine deployment)
 - **Server Port**: Default runs on `http://127.0.0.1:8000`
 - **Retriever**: Uses e5-base-v2 model for document retrieval
 - **Summarizer**: Integrates SFT-trained summarization model
+- **Deployment**: For separate machines/GPUs, adjust `CUDA_VISIBLE_DEVICES` and URL accordingly
 
 ### API Endpoints
 
 SFT Summarizer provides the following API endpoints:
 
 #### 1. Retrieve and Summarize (single query)
-```bash
+```http
 POST http://127.0.0.1:8000/retrieve
 Content-Type: application/json
 
@@ -225,7 +226,7 @@ Content-Type: application/json
 ```
 
 #### 1b. (Optional) Batch Retrieve and Summarize
-```bash
+```http
 POST http://127.0.0.1:8000/batch_retrieve
 Content-Type: application/json
 
@@ -237,7 +238,7 @@ Content-Type: application/json
 ```
 
 #### 2. Summarize Only (Optional)
-```bash
+```http
 POST http://127.0.0.1:8000/summarize
 Content-Type: application/json
 
@@ -303,7 +304,7 @@ export BASE_MODEL='/mnt/nvme_data/Qwen2.5-3B-Base'
 # export BASE_MODEL='/mnt/nvme_data/Qwen2.5-3B-Instruct'
 
 # Experiment name
-export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summarizer
+export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-base-v0.2-summarizer
 ```
 
 #### Training Parameters Details
@@ -333,10 +334,10 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summar
 | | `critic.cliprange_value` | 0.5 | Value function clipping range |
 | **Generation Config** | `actor_rollout_ref.rollout.temperature` | 1.0 | Generation temperature (near-deterministic) |
 | | `actor_rollout_ref.rollout.top_p` | 1.0 | Top-p sampling (near-deterministic) |
-
-> We match Search-R1's decoding recipe (temperature=1.0, top-p=1.0) for apples-to-apples comparison; despite not being greedy (temp=0), this behaves stably in our setup.
 | | `actor_rollout_ref.rollout.n_agent` | 1 | Number of agents |
 | | `max_turns` | 5 | Maximum conversation turns (vs baseline 3) |
+
+> We match Search-R1's decoding recipe (temperature=1.0, top-p=1.0) for apples-to-apples comparison; despite not being greedy (temp=0), this behaves stably in our setup.
 | **Memory Config** | `actor_rollout_ref.rollout.gpu_memory_utilization` | 0.8 | GPU memory utilization |
 | | `actor_rollout_ref.model.enable_gradient_checkpointing` | true | Enable gradient checkpointing |
 | | `actor_rollout_ref.model.use_remove_padding` | True | Remove padding optimization |
@@ -480,12 +481,16 @@ trainer.n_gpus_per_node=4
 
 3. **Retrieval Service Connection Failed**
    ```bash
-   # Check if service is running
+   # If your server exposes a health endpoint:
    curl http://127.0.0.1:8000/health
+   
+   # Otherwise try the root or docs:
+   curl http://127.0.0.1:8000/
+   # or open http://127.0.0.1:8000/docs in a browser
    
    # Check port usage
    lsof -i :8000
-```
+   ```
 
 ## Results
 
@@ -497,6 +502,8 @@ trainer.n_gpus_per_node=4
 
 #### **Qwen2.5-7B-Base + PPO**
 - **Search-R1**: 0.431 → **RECON**: 0.444
+
+*(Averages computed over the same 7 datasets as in the paper's main table.)*
 
 ### ⚡ **Efficiency (Qwen2.5-7B-Base + PPO)**
 - **Avg context length**: 948.27 → 619.7 tokens
