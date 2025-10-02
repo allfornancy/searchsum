@@ -52,24 +52,6 @@ pip3 install flash-attn --no-build-isolation
 pip install wandb
 ```
 
-### Retriever environment (optional)
-If you would like to call a local retriever as the search engine, you can install the environment as follows. (We recommend using a separate environment.)
-```bash
-conda create -n retriever python=3.10
-conda activate retriever
-
-# we recommend installing torch with conda for faiss-gpu
-conda install pytorch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 pytorch-cuda=12.1 -c pytorch -c nvidia
-pip install transformers datasets pyserini
-
-## install the gpu version faiss to guarantee efficient RL rollout
-conda install -c pytorch -c nvidia faiss-gpu=1.8.0
-
-## API function
-pip install uvicorn fastapi
-```
-
-
 ## Quick Start
 
 Train a reasoning + search LLM on **NQ and HotpotQA dataset combination** with e5 as the retriever and Wikipedia as the corpus.
