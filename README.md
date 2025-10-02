@@ -115,7 +115,17 @@ python search_r1/search/retrieval_server.py --index_path $index_file \
                                             --faiss_gpu
 ```
 
-### Step 4: Start Training
+### Step 4: Launch SFT Summarizer
+
+```bash
+# Activate retrieval environment
+conda activate retriever
+
+# Launch SFT Summarizer server
+bash retrieval_with_summarizer_launch.sh
+```
+
+### Step 5: Start Training
 
 ```bash
 # Set environment variables
@@ -166,29 +176,6 @@ bash train_ppo.sh
 #### **5. General and Modular**
 - The summarizer is plug-and-play: it slots between retrieval and policy, and can be improved independently.
 - The summarizer is aspect-aware; you can reweight or ablate aspects (e.g., clarity vs. coverage) without retraining the policy.
-
-### Launching SFT Summarizer
-
-#### Method 1: Using Launch Script (Recommended)
-```bash
-# Activate retrieval environment
-conda activate retriever
-
-# Launch SFT Summarizer server
-bash retrieval_with_summarizer_launch.sh
-```
-
-#### Method 2: Direct Python Script Execution
-```bash
-# Activate retrieval environment
-conda activate retriever
-
-# Set GPU device (optional, defaults to GPU 4)
-export CUDA_VISIBLE_DEVICES=4
-
-# Run SFT Summarizer directly
-python search_r1/search/retrieval_with_summarizer.py
-```
 
 ### Configuration
 
