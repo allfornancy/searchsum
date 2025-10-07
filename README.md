@@ -152,10 +152,37 @@ git clone https://huggingface.co/datasets/allfornancy/mixed-sft-data-alpaca-comp
 ```
 
 ### Training Configuration
+
+#### Framework
+- **Training Framework**: LlamaFactory (Zheng et al., 2024)
+- **Training Method**: SFT-only (no RL on summarizer)
+
+#### General Training Parameters
+- **Effective Batch Size**: 16
+- **Per-device Batch Size**: 1
+- **Gradient Accumulation**: 16 (on 1 × H100 GPU)
+- **Learning Rate**: 1e-4
+- **Warmup**: 5% for 1 epoch
+
+#### SFT Training Specifics
+- **Precision**: bf16
+- **LoRA Configuration**:
+  - `rank = 8`
+  - `α = 32`
+  - `target_modules = all-linear`
+- **Max Sequence Length**: 2048
+
+#### Training Stages
 - **Stage 1**: Train classifier on MS MARCO to separate useful vs non-useful passages
 - **Stage 2**: Distill GPT-4o-mini summaries across 6 aspects (clarity, factual correctness, completeness, coverage, coherence, logicality)
 - **Final Dataset**: ~1.47M training summaries (~1.0M NQ + ~468k HotpotQA)
-- **Training Method**: SFT-only (no RL on summarizer)
+
+#### RECON Training
+- **Summarizer Status**: Frozen during RECON training
+- **Rollout Sampling**:
+  - `top-p = 0.9`
+  - `top-k = 40`
+  - `temperature = 0.7`
 
 ## SFT Summarizer Usage
 
