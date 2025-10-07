@@ -31,10 +31,10 @@ This turns evidence compression into a first-class reasoning tool rather than an
 
 ## Installation
 
-### Search-R1 environment
+### RECON environment
 ```bash
-conda create -n searchr1 python=3.9
-conda activate searchr1
+conda create -n recon python=3.9
+conda activate recon
 # install torch [or you can skip this step and let vllm to install the correct version for you]
 pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cu121
 # install vllm
@@ -66,8 +66,8 @@ git clone https://github.com/allfornancy/searchsum.git
 cd searchsum
 
 # Create conda environment
-conda create -n searchr1 python=3.9
-conda activate searchr1
+conda create -n recon python=3.9
+conda activate recon
 
 # Install PyTorch (adjust CUDA version as needed)
 pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cu121
@@ -261,7 +261,7 @@ bash retrieval_with_summarizer_launch.sh
 
 (3) Run RECON inference.
 ```bash
-conda activate searchr1
+conda activate recon
 python infer_with_summarizer.py
 ```
 
