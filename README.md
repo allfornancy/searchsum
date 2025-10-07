@@ -50,7 +50,7 @@ pip install wandb
 
 ## Quick Start
 
-This guide shows how to train RECON (Search-R1 with SFT Summarizer) on **NQ and HotpotQA datasets**.
+This guide shows how to train RECON on **NQ and HotpotQA datasets**.
 
 ### Prerequisites
 

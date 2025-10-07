@@ -4,14 +4,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="search-r1",
+    name="recon",
     version="0.1.0",
     author="Your Lab Name",
     author_email="your-email@university.edu",
-    description="Search-augmented reasoning with reinforcement learning",
+    description="RECON: Efficient Multi-Hop RAG via Learned Context Compression",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/Search-R1",
+    url="https://github.com/allfornancy/searchsum",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
