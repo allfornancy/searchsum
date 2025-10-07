@@ -127,10 +127,10 @@ bash retrieval_with_summarizer_launch.sh
 # Set environment variables
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export BASE_MODEL='/path/to/Qwen2.5-3B-Base'  # or Qwen2.5-3B-Instruct
-export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-base-v0.2-summarizer
+export EXPERIMENT_NAME=nq_hotpotqa-recon-ppo-qwen2.5-3b-base-v0.2-summarizer
 
 # Run training
-bash train_ppo.sh
+bash train_recon.sh
 ```
 
 ## SFT Summarizer Training
@@ -251,12 +251,12 @@ During training, the model uses SFT Summarizer in the following way:
 (1) Launch retrieval server.
 ```bash
 conda activate retriever
-bash retrieval_launch.sh
+bash recon_retrieval_launch.sh
 ```
 
 (2) Launch SFT summarizer server.
 ```bash
-bash retrieval_with_summarizer_launch.sh
+bash recon_summarizer_launch.sh
 ```
 
 (3) Run RECON inference.

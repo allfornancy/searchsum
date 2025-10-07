@@ -1,8 +1,8 @@
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export DATA_DIR='data/nq_hotpotqa_train'
 
-export BASE_MODEL='/mnt/nvme_data/Qwen2.5-3B-Instruct'
-export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-instruct-v0.2-summarizer
+export BASE_MODEL='/mnt/nvme_data/Qwen2.5-3B-Base'
+export EXPERIMENT_NAME=nq_hotpotqa-recon-ppo-qwen2.5-3b-base-v0.2-summarizer
 
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
