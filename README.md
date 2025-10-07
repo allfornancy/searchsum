@@ -22,6 +22,7 @@ This turns evidence compression into a first-class reasoning tool rather than an
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [SFT Summarizer Training](#sft-summarizer-training)
 - [SFT Summarizer Usage](#sft-summarizer-usage)
 - [Inference](#inference)
 - [Features](#features)
@@ -131,6 +132,30 @@ export EXPERIMENT_NAME=nq_hotpotqa-search-r1-ppo-qwen2.5-3b-base-v0.2-summarizer
 # Run training
 bash train_ppo.sh
 ```
+
+## SFT Summarizer Training
+
+### Two-Stage Training Process
+
+RECON's summarizer uses a two-stage SFT training approach:
+
+#### Stage 1: Relevance Pretraining (MS MARCO)
+```bash
+# Download MS MARCO relevance data
+git clone https://huggingface.co/datasets/allfornancy/msmarco-sft
+```
+
+#### Stage 2: Multi-Aspect Distillation
+```bash
+# Download mixed training data (NQ + HotpotQA)
+git clone https://huggingface.co/datasets/allfornancy/mixed-sft-data-alpaca-complete
+```
+
+### Training Configuration
+- **Stage 1**: Train classifier on MS MARCO to separate useful vs non-useful passages
+- **Stage 2**: Distill GPT-4o-mini summaries across 6 aspects (clarity, factual correctness, completeness, coverage, coherence, logicality)
+- **Final Dataset**: ~1.47M training summaries (~1.0M NQ + ~468k HotpotQA)
+- **Training Method**: SFT-only (no RL on summarizer)
 
 ## SFT Summarizer Usage
 
