@@ -267,33 +267,7 @@ python infer_with_summarizer.py
 
 You can modify the ```question``` on line 7 to something you're interested in.
 
-## Features
 
-### 🔍 Search Engine Support
-- ✅ Local sparse retrievers (e.g., BM25)
-- ✅ Local dense retrievers (flat indexing and ANN indexing)
-- ✅ Online search engines (Google, Bing, Brave, etc.)
-- ✅ Off-the-shelf neural rerankers
-
-### 🧠 Model Support
-- ✅ Multiple LLM models (Llama3, Qwen2.5, etc.)
-- ✅ Multiple reinforcement learning methods supported by the underlying framework (e.g., PPO; GRPO/REINFORCE are framework-level options). **This project's experiments use PPO-only (no GRPO).**
-- ✅ Multi-GPU and multi-node training support
-
-### 📝 RECON Summarizer Features (Our Core Innovation & Contribution)
-- ✅ **🎯 Novel Architecture**: First implementation of active context compression within RL-RAG loop
-- ✅ **📈 Performance Breakthrough**: Two-stage SFT training (MS MARCO relevance → multi-aspect distillation)
-- ✅ **🔧 Seamless Integration**: Drop-in augmentation to Search-R1 with PPO-only policy optimization
-- ✅ **🚀 Production-Ready API**: RESTful API for retrieval and summarization services
-- ✅ **⚡ GPU Optimization**: GPU-accelerated summarization generation for real-time processing
-- ✅ **🎛️ Aspect-Aware Control**: Six controlled aspects (clarity, factual correctness, completeness, coverage, coherence, logicality)
-- ✅ **🔌 Modular Design**: Plug-and-play summarizer that can be improved independently
-
-### 🚀 Training Features
-- ✅ **End-to-End Training**: Complete training pipeline from retrieval to summarization to reasoning
-- ✅ **Reinforcement Learning**: Uses PPO and other algorithms to optimize search and reasoning capabilities
-- ✅ **Multi-turn Dialogue**: Support for multi-turn search and reasoning interactions
-- ✅ **Real-time Monitoring**: Complete training logs and checkpoint management
 
 ## Acknowledgments
 
